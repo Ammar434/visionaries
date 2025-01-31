@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Setting the viewport enables you to control the width and scaling of the viewport ie. for mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title and description are important for SEO. And <title> is what is rendered in the browser tab name. -->
+    <title>Vizionaries</title>
+    <meta name="description" content="The site for our project!">
+    <link rel="icon" href="images/icon.png">
+
+    <!-- Styles and scripts -->
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+    <div class="header-title">
+        <h1>VIZIONARIES</h1>
+        <div>
+            <h2>Cycling accidents</h2>
+            <h3>To what extent does the development of cycling infrastructure help reduce the number and severity of
+                cycling accidents?</h3>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="column_home" id="left-col" align="center">
+            <form action="/" method="get" align="center">
+                <input type="submit" value="The Data" align="center">
+            </form>
+        </div>
+
+        <div class="column_home" id="left-col" align="center">
+            <form action="src/global_overview.html" method="get" align="center">
+                <input type="submit" value="Global Overview" align="center">
+            </form>
+        </div>
+
+        <div class="column_home" id="left-col" align="center">
+            <form action="src/map.html" method="post" align="center">
+                <input type="submit" value="Map" align="center">
+            </form>
+        </div>
+
+
+        <div class="column_home" id="left-col" align="center">
+            <form action="src/map3d.html" method="post" align="center">
+                <input type="submit" value="See it in 3d" align="center">
+            </form>
+        </div>
+    </div>
+
+    <div>
+
+        TODO: Write a paragraph to explain what the project is about
+        <br>
+        TODO : Explain how we collect the data
+        <br>
+        TODO : what technologies are used
+    </div>
+
+</body>
+
+<!-- Linking your scripts.js here after the DOM has loaded to allow element targeting with d3. -->
+<script src="lib/d3.v7.js"></script>
+<!-- <script src="scripts.js"></script> -->
+
+</html>
