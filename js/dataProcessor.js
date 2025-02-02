@@ -18,10 +18,10 @@ export class DataProcessor {
 
         try {
             const csvFiles = await Promise.all([
-                this.loadCSVFile(`caracteristiques-${year}.csv`),
-                this.loadCSVFile(`vehicules-${year}.csv`),
-                this.loadCSVFile(`usagers-${year}.csv`),
-                this.loadCSVFile(`lieux-${year}.csv`)
+                this.loadCSVFile(`clean-caracteristiques-${year}.csv`),
+                this.loadCSVFile(`clean-vehicules-${year}.csv`),
+                this.loadCSVFile(`clean-usagers-${year}.csv`),
+                this.loadCSVFile(`clean-lieux-${year}.csv`)
             ]);
 
             [
