@@ -1,19 +1,14 @@
-// vite.config.js
-export default {
-    root: '.',
-    publicDir: 'public',
+import { defineConfig } from 'vite';
+import { resolve } from 'path';
+
+export default defineConfig({
     server: {
-        port: 3000
+        port: 3000,
+        open: false
     },
     build: {
         outDir: 'dist',
-        rollupOptions: {
-            input: {
-                main: '/index.html',
-                map: '/src/map.html',
-                global_overview: '/src/global_overview.html',
-                map3d: '/src/map3d.html'
-            }
-        }
-    }
-}
+        assetsDir: 'assets'
+    },
+    publicDir: 'public'
+})

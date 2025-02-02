@@ -4,11 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Bicycle Accidents Analysis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="../styles/global_overview.css">
 </head>
 
 <body>
-    TODO : Add some basic metric plot chart bar char to understand quickly how bicycle happen how many
+    <div class=" dashboard">
+        <h1>Bicycle Accidents Analysis - 2022</h1>
+        <div id="total-accidents" class="total-accidents">
+            Loading statistics...
+        </div>
+        <div class="charts-grid">
+            <div id="monthly-chart" class="chart-container">
+                <div class="chart-title">Monthly Distribution</div>
+            </div>
+            <div id="severity-chart" class="chart-container">
+                <div class="chart-title">Severity Distribution</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/app.js"></script>
 </body>
 
 </html>

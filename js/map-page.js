@@ -1,6 +1,7 @@
 // map-page.js
 import { DataProcessor } from './dataProcessor.js';
 import { MapVisualizer } from './mapVisualizer.js';
+import * as d3 from 'd3';
 
 class MapPage {
     constructor() {
@@ -126,7 +127,6 @@ class MapPage {
     }
 
     showError(message) {
-        // Add error handling UI here
         console.error(message);
     }
 }
