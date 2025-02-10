@@ -35,17 +35,834 @@
         </div>
 
         <div id="topRow" class="ui grid stackable">
-            <!-- We'll add the statistic boxes here in the next step -->
+            <div id="totalAccidentsBox" class="four wide column">
+                <div class="figure_label">
+                    <div class="label_main1">
+                        Total des Accidents
+                    </div>
+                </div>
+                <div class="figure_box">
+                    <div class="figure_text" id="totalValue" style="color: #465F7F;">--</div>
+                </div>
+            </div>
+
+            <div id="accidentsIncreasesBox" class="four wide column">
+                <div class="figure_label">
+                    <div class="label_main2">
+                        Augmentation des Accidents
+                    </div>
+                    <div class="text" style="font-size: 9px; white-space: nowrap">
+                        Par rapport à l'année précédente
+                    </div>
+                </div>
+                <div class="figure_box">
+                    <div class="figure_text" id="increaseValue" style="padding-left: 10px; color: #EF4A60">--</div>
+                    <div style="position: absolute; top: 45px; left: 8px;" class="changeUp"></div>
+                </div>
+            </div>
+
+            <div id="accidentsDecreasesBox" class="five wide column">
+                <div class="figure_label">
+                    <div class="label_main2">
+                        Diminution des Accidents
+                    </div>
+                    <div class="text" style="font-size: 9px; white-space: nowrap">
+                        Par rapport à l'année précédente
+                    </div>
+                </div>
+                <div class="figure_box">
+                    <div class="figure_text" id="decreaseValue" style="padding-left: 10px; color: #338EC9">--</div>
+                    <div style="position: absolute; top: 45px; left: 8px;" class="changeDown"></div>
+                </div>
+            </div>
+
+            <div id="yearSelectorBox" class="three wide column">
+                <div class="figure_label">
+                    <div class="label_main1">
+                        Année
+                    </div>
+                </div>
+                <div class="figure_box" style="text-align: center;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="prev" id="yearDown">◀</div>
+                        <div class="figure_text" id="yearBox" style="color: #000; display: inline-block;">2023</div>
+                        <div class="next" id="yearUp">▶</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h4 class="ui blue header">Accidents de Vélo par Année</h4>
+        <div class="text changeGraphSubTitle" style="font-size: 10px;">
+            Cliquez sur les graphiques pour sélectionner une année
+        </div>
+        <div class="chart-container">
+            <div id="totalAccidentsChart" class="totalGraphDiv"></div>
+        </div>
+
+        <h4 class="ui blue header">Variation Annuelle des Accidents</h4>
+        <div class="text changeGraphSubTitle" style="font-size: 10px">
+            Par rapport à l'année précédente
+        </div>
+        <div class="chart-container">
+            <div id="changeGraphDiv" class="changeGraphDiv">
+                <div style="position: absolute; top: 10px; left: 10px;" class="changeUp"></div>
+                <span class="axisLabel inc">Augmentation</span>
+                <span class="axisLabel dec">Diminution</span>
+                <div style="position: absolute; bottom: 20px; left: 10px;" class="changeDown"></div>
+            </div>
+        </div>
+
+        <!-- Add after your last chart-container -->
+        <div class="middleRow ui grid stackable">
+            <div id="map_header" class="sixteen wide column">
+                <h4 class="ui blue header">Carte des Accidents par Département</h4>
+                <div class="text changeGraphSubTitle" style="font-size: 10px;">
+                    Cliquez sur un département pour voir les détails
+                </div>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map" style="position: relative;">
+                <div id="map_tooltip" class="dc-tooltip"></div>
+
+                <!-- Map legend -->
+                <div id="mapLegend" class="maplegend">
+                    <table cellpadding="0" cellspacing="2" style="border: none" class="axisLabel">
+                        <tr>
+                            <td colspan="2" class="axisTitle" style="padding-left: 0px; font-weight: bold;">
+                                Accidents par Département
+                            </td>
+                        </tr>
+                        <!-- Legend content will be added by JavaScript -->
+                    </table>
+                </div>
+
+                <div id="map_info" class="map_info">
+                    <div id="Department" class="map_info_title">Département</div>
+                    <div id="mapinfo_text">
+                        <div id="accidentTitle" class="axisTitle" style="font-size: 11px; font-weight: bold;">
+                            <span id="deptName">--</span>
+                        </div>
+                        <span id="accidentTotal" style="font-size: 14px; font-weight: bold; color: #0072BC">--</span>
+                        <span style="font-size: 10px; font-weight: normal;" class="mapInfoLabel"> accidents</span><br />
+
+                        <div id="accidentChangeIcon" class="changeSmallUp" style="display: none;"></div>
+                        <span id="accidentChange" style="font-size: 12px; font-weight: normal;">--</span>
+                        <span id="accidentChangeYear" style="font-size: 10px; font-weight: normal;"
+                            class="mapInfoLabel">
+                            variation depuis <span id="prevYear">--</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script type="module">
-        import { DataProcessor } from '../js/dataProcessor.js';
+        import { DataProcessor } from '../js/data_processor.js';
+        class Dashboard {
+            constructor() {
+                this.currentYear = 2023;
+                this.data = null;
+                this.processor = new DataProcessor();
+                this.margin = { top: 20, right: 30, bottom: 30, left: 60 };
+                this.width = 1000 - this.margin.left - this.margin.right;
+                this.height = 300 - this.margin.top - this.margin.bottom;
+            }
 
-        // Initialize data processor
-        const processor = new DataProcessor();
+            async initialize() {
+                try {
+                    // Load data
+                    this.data = await this.processor.loadAllYearsData();
 
-        // We'll add the main visualization logic in the next steps
+                    // Get analytics
+                    this.totalsByYear = this.processor.getTotalAccidentsByYear();
+                    this.trends = this.processor.getYearlyTrends();
+
+                    // Initialize visualizations
+                    this.initializeTotalChart();
+                    this.initializeChangeChart();
+                    await this.initializeMap();
+
+                    // Setup event listeners
+                    document.getElementById('yearDown').addEventListener('click', () => this.changeYear(-1));
+                    document.getElementById('yearUp').addEventListener('click', () => this.changeYear(1));
+
+                    // Initial update
+                    this.updateDashboard();
+                } catch (error) {
+                    console.error('Error initializing dashboard:', error);
+                    this.handleError(error);
+                }
+            }
+
+            initializeTotalChart() {
+                const data = Object.entries(this.totalsByYear)
+                    .map(([year, count]) => ({ year: +year, count }))
+                    .sort((a, b) => a.year - b.year);
+
+                const svg = d3.select("#totalAccidentsChart")
+                    .append("svg")
+                    .attr("width", this.width + this.margin.left + this.margin.right)
+                    .attr("height", this.height + this.margin.top + this.margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+                // Add gradient definition
+                const gradient = svg.append("defs")
+                    .append("linearGradient")
+                    .attr("id", "area-gradient")
+                    .attr("x1", "0%").attr("y1", "0%")
+                    .attr("x2", "0%").attr("y2", "100%");
+
+                gradient.append("stop")
+                    .attr("offset", "0%")
+                    .attr("stop-opacity", 0.4);
+
+                gradient.append("stop")
+                    .attr("offset", "100%")
+                    .attr("stop-opacity", 0);
+
+                // Scales
+                const x = d3.scaleLinear()
+                    .domain(d3.extent(data, d => d.year))
+                    .range([0, this.width]);
+
+                const y = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => d.count) * 1.1])
+                    .range([this.height, 0]);
+
+                // Grid lines
+                svg.append("g")
+                    .attr("class", "grid")
+                    .call(d3.axisLeft(y)
+                        .tickSize(-this.width)
+                        .tickFormat(""));
+
+                // Area generator
+                const area = d3.area()
+                    .x(d => x(d.year))
+                    .y0(this.height)
+                    .y1(d => y(d.count))
+                    .curve(d3.curveMonotoneX);
+
+                // Add the area path
+                svg.append("path")
+                    .datum(data)
+                    .attr("class", "area")
+                    .attr("d", area)
+                    .style("fill", "url(#area-gradient)");
+
+                // Line generator with smooth curve
+                const line = d3.line()
+                    .x(d => x(d.year))
+                    .y(d => y(d.count))
+                    .curve(d3.curveMonotoneX);
+
+                // Add the line path with animation
+                const path = svg.append("path")
+                    .datum(data)
+                    .attr("class", "line")
+                    .attr("d", line)
+                    .style("stroke", "#465F7F")
+                    .style("opacity", 0);
+
+                const pathLength = path.node().getTotalLength();
+
+                path.style("stroke-dasharray", pathLength)
+                    .style("stroke-dashoffset", pathLength)
+                    .style("opacity", 1)
+                    .transition()
+                    .duration(2000)
+                    .ease(d3.easeLinear)
+                    .style("stroke-dashoffset", 0);
+
+                // Add dots with animation
+                svg.selectAll(".dot")
+                    .data(data)
+                    .enter()
+                    .append("circle")
+                    .attr("class", "dot")
+                    .attr("cx", d => x(d.year))
+                    .attr("cy", d => y(d.count))
+                    .attr("r", 0)
+                    .style("stroke", "#465F7F")
+                    .transition()
+                    .delay((d, i) => i * 100)
+                    .duration(500)
+                    .attr("r", 5);
+
+                // Enhanced tooltip
+                const tooltip = d3.select("#totalAccidentsChart")
+                    .append("div")
+                    .attr("class", "tooltip")
+                    .style("opacity", 0);
+
+                svg.selectAll(".dot")
+                    .on("mouseover", (event, d) => {
+                        d3.select(event.target)
+                            .transition()
+                            .duration(200)
+                            .attr("r", 7);
+
+                        tooltip.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        tooltip.html(`
+                            <div class="tooltip-title">${d.year}</div>
+                            <div class="tooltip-value">
+                                ${d.count.toLocaleString()} accidents
+                            </div>
+                        `)
+                            .style("left", (event.pageX + 10) + "px")
+                            .style("top", (event.pageY - 28) + "px");
+                    })
+                    .on("mouseout", (event) => {
+                        d3.select(event.target)
+                            .transition()
+                            .duration(200)
+                            .attr("r", 5);
+
+                        tooltip.transition()
+                            .duration(500)
+                            .style("opacity", 0);
+                    })
+                    .on("click", (event, d) => {
+                        this.currentYear = d.year;
+                        this.updateDashboard();
+
+                        // Update selected dot styling
+                        svg.selectAll(".dot")
+                            .classed("selected-year", false);
+                        d3.select(event.target)
+                            .classed("selected-year", true);
+                    });
+
+                // Axes
+                svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", `translate(0,${this.height})`)
+                    .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+                svg.append("g")
+                    .attr("class", "y axis")
+                    .call(d3.axisLeft(y));
+            }
+
+            initializeChangeChart() {
+                // Similar enhanced styling and animations for the change chart...
+                // Add smooth transitions, gradients, and improved interactivity
+                const data = Object.entries(this.totalsByYear)
+                    .map(([year, count], index, array) => {
+                        const prevCount = index > 0 ? array[index - 1][1] : count;
+                        const change = count - prevCount;
+                        return {
+                            year: +year,
+                            change: change,
+                            isIncrease: change > 0
+                        };
+                    })
+                    .slice(1)
+                    .sort((a, b) => a.year - b.year);
+
+                const svg = d3.select("#changeGraphDiv")
+                    .append("svg")
+                    .attr("width", this.width + this.margin.left + this.margin.right)
+                    .attr("height", this.height + this.margin.top + this.margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+                const x = d3.scaleLinear()
+                    .domain(d3.extent(data, d => d.year))
+                    .range([0, this.width]);
+
+                const y = d3.scaleLinear()
+                    .domain([
+                        d3.min(data, d => d.change) * 1.1,
+                        d3.max(data, d => d.change) * 1.1
+                    ])
+                    .range([this.height, 0]);
+
+                // Add grid
+                svg.append("g")
+                    .attr("class", "grid")
+                    .call(d3.axisLeft(y)
+                        .tickSize(-this.width)
+                        .tickFormat(""));
+
+                // Add zero line
+                svg.append("line")
+                    .attr("class", "zero-line")
+                    .attr("x1", 0)
+                    .attr("x2", this.width)
+                    .attr("y1", y(0))
+                    .attr("y2", y(0));
+
+                // Add bars with animation
+                svg.selectAll(".bar")
+                    .data(data)
+                    .enter()
+                    .append("rect")
+                    .attr("class", d => `bar ${d.isIncrease ? 'increase' : 'decrease'}`)
+                    .attr("x", d => x(d.year) - 5)
+                    .attr("width", 10)
+                    .attr("y", y(0))
+                    .attr("height", 0)
+                    .transition()
+                    .duration(1000)
+                    .delay((d, i) => i * 50)
+                    .attr("y", d => d.isIncrease ? y(d.change) : y(0))
+                    .attr("height", d => Math.abs(y(0) - y(d.change)));
+
+                // Enhanced tooltip
+                const tooltip = d3.select("#changeGraphDiv")
+                    .append("div")
+                    .attr("class", "tooltip")
+                    .style("opacity", 0);
+
+                svg.selectAll(".bar")
+                    .on("mouseover", (event, d) => {
+                        d3.select(event.target)
+                            .classed("highlight-bar", true);
+
+                        tooltip.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        tooltip.html(`
+                            <div class="tooltip-title">${d.year}</div>
+                            <div class="tooltip-value">
+                                ${d.isIncrease ? '+' : ''}${d.change.toLocaleString()} accidents
+                            </div>
+                        `)
+                            .style("left", (event.pageX + 10) + "px")
+                            .style("top", (event.pageY - 28) + "px");
+                    })
+                    .on("mouseout", (event) => {
+                        d3.select(event.target)
+                            .classed("highlight-bar", false);
+
+                        tooltip.transition()
+                            .duration(500)
+                            .style("opacity", 0);
+                    })
+                    .on("click", (event, d) => {
+                        this.currentYear = d.year;
+                        this.updateDashboard();
+                    });
+
+                // Add axes
+                svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", `translate(0,${y(0)})`)
+                    .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+                svg.append("g")
+                    .attr("class", "y axis")
+                    .call(d3.axisLeft(y));
+            }
+
+            initializeChangeChart() {
+                const data = Object.entries(this.totalsByYear)
+                    .map(([year, count], index, array) => {
+                        const prevCount = index > 0 ? array[index - 1][1] : count;
+                        const change = count - prevCount;
+                        return {
+                            year: +year,
+                            change: change,
+                            isIncrease: change > 0,
+                            prevTotal: prevCount,
+                            newTotal: count
+                        };
+                    })
+                    .slice(1)
+                    .sort((a, b) => a.year - b.year);
+
+                const svg = d3.select("#changeGraphDiv")
+                    .append("svg")
+                    .attr("width", this.width + this.margin.left + this.margin.right)
+                    .attr("height", this.height + this.margin.top + this.margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+                // Scale for years (X axis)
+                const x = d3.scaleLinear()
+                    .domain(d3.extent(data, d => d.year))
+                    .range([0, this.width]);
+
+                // Separate scales for increases and decreases
+                const maxIncrease = d3.max(data, d => d.isIncrease ? Math.abs(d.change) : 0);
+                const maxDecrease = d3.max(data, d => !d.isIncrease ? Math.abs(d.change) : 0);
+
+                const yIncrease = d3.scaleLinear()
+                    .domain([0, maxIncrease])
+                    .range([this.height / 2, 0]);
+
+                const yDecrease = d3.scaleLinear()
+                    .domain([0, maxDecrease])
+                    .range([0, this.height / 2]);
+
+                // Add center line
+                svg.append("line")
+                    .attr("x1", 0)
+                    .attr("x2", this.width)
+                    .attr("y1", this.height / 2)
+                    .attr("y2", this.height / 2)
+                    .style("stroke", "#999")
+                    .style("stroke-width", 1)
+                    .style("stroke-dasharray", "4");
+
+                // Create bars with smooth transitions
+                // Increases (upper half)
+                svg.selectAll(".increase-bar")
+                    .data(data.filter(d => d.isIncrease))
+                    .enter()
+                    .append("rect")
+                    .attr("class", "bar increase")
+                    .attr("x", d => x(d.year) - 8)
+                    .attr("width", 16)
+                    .attr("y", this.height / 2)
+                    .attr("height", 0)
+                    .transition()
+                    .duration(1000)
+                    .attr("y", d => yIncrease(Math.abs(d.change)))
+                    .attr("height", d => this.height / 2 - yIncrease(Math.abs(d.change)));
+
+                // Decreases (lower half)
+                svg.selectAll(".decrease-bar")
+                    .data(data.filter(d => !d.isIncrease))
+                    .enter()
+                    .append("rect")
+                    .attr("class", "bar decrease")
+                    .attr("x", d => x(d.year) - 8)
+                    .attr("width", 16)
+                    .attr("y", this.height / 2)
+                    .attr("height", 0)
+                    .transition()
+                    .duration(1000)
+                    .attr("height", d => yDecrease(Math.abs(d.change)));
+
+                // Add X axis
+                svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", `translate(0,${this.height / 2})`)
+                    .call(d3.axisBottom(x)
+                        .tickFormat(d3.format("d"))
+                        .ticks(data.length));
+
+                // Add Y axes
+                // Increases
+                svg.append("g")
+                    .attr("class", "y axis")
+                    .call(d3.axisLeft(yIncrease));
+
+                // Decreases
+                svg.append("g")
+                    .attr("class", "y axis")
+                    .call(d3.axisLeft(yDecrease)
+                        .tickFormat(d => Math.abs(d)));
+
+                // Add labels
+                svg.append("text")
+                    .attr("x", 10)
+                    .attr("y", 20)
+                    .attr("class", "axis-label")
+                    .style("fill", "#EF4A60")
+                    .text("Augmentation");
+
+                svg.append("text")
+                    .attr("x", 10)
+                    .attr("y", this.height - 10)
+                    .attr("class", "axis-label")
+                    .style("fill", "#338EC9")
+                    .text("Diminution");
+
+                // Enhanced tooltip
+                const tooltip = d3.select("#changeGraphDiv")
+                    .append("div")
+                    .attr("class", "tooltip")
+                    .style("opacity", 0);
+
+                // Add interactivity to all bars
+                svg.selectAll(".bar")
+                    .on("mouseover", (event, d) => {
+                        const isIncrease = d3.select(event.target).classed("increase");
+
+                        d3.select(event.target)
+                            .style("opacity", 0.7);
+
+                        tooltip.transition()
+                            .duration(200)
+                            .style("opacity", 1);
+
+                        tooltip.html(`
+                <div class="tooltip-title">${d.year}</div>
+                <div class="tooltip-value">
+                    ${isIncrease ? '+' : ''}${d.change.toLocaleString()} accidents</br>
+                    (${d.prevTotal.toLocaleString()} → ${d.newTotal.toLocaleString()})
+                </div>
+            `)
+                            .style("left", (event.pageX + 10) + "px")
+                            .style("top", (event.pageY - 28) + "px");
+                    })
+                    .on("mouseout", (event) => {
+                        d3.select(event.target)
+                            .style("opacity", 1);
+
+                        tooltip.transition()
+                            .duration(500)
+                            .style("opacity", 0);
+                    })
+                    .on("click", (event, d) => {
+                        this.currentYear = d.year;
+                        this.updateDashboard();
+
+                        // Update all bars' opacity
+                        svg.selectAll(".bar")
+                            .style("opacity", 1);
+
+                        // Highlight selected bar
+                        d3.select(event.target)
+                            .style("opacity", 0.7);
+                    });
+            }
+
+            changeYear(delta) {
+                const newYear = this.currentYear + delta;
+                if (newYear >= 2005 && newYear <= 2023) {
+                    this.currentYear = newYear;
+                    this.updateDashboard();
+                }
+            }
+
+            updateDashboard() {
+                // Update year display
+                document.getElementById('yearBox').textContent = this.currentYear;
+
+                // Get current and previous year totals
+                const currentTotal = this.totalsByYear[this.currentYear] || 0;
+                const prevTotal = this.totalsByYear[this.currentYear - 1] || 0;
+
+                // Update total accidents
+                document.getElementById('totalValue').textContent = currentTotal.toLocaleString();
+
+                // Calculate and update increases/decreases
+                if (prevTotal > 0) {
+                    const difference = currentTotal - prevTotal;
+                    if (difference > 0) {
+                        document.getElementById('increaseValue').textContent = `+${difference.toLocaleString()}`;
+                        document.getElementById('decreaseValue').textContent = '0';
+                    } else if (difference < 0) {
+                        document.getElementById('increaseValue').textContent = '0';
+                        document.getElementById('decreaseValue').textContent = Math.abs(difference).toLocaleString();
+                    } else {
+                        document.getElementById('increaseValue').textContent = '0';
+                        document.getElementById('decreaseValue').textContent = '0';
+                    }
+                }
+            }
+
+
+            async initializeMap() {
+                try {
+                    const response = await fetch('../data/france-geojson/departements.geojson');
+                    this.geoData = await response.json();
+
+                    const width = 800;
+                    const height = 700;
+
+                    // Create main SVG
+                    const svg = d3.select("#map")
+                        .append("svg")
+                        .attr("width", width)
+                        .attr("height", height)
+                        .attr("viewBox", [0, 0, width, height]);
+
+                    // Create map container group
+                    const g = svg.append("g");
+
+                    // Updated projection
+                    const projection = d3.geoConicConformal()
+                        .center([2.454071, 46.279229])
+                        .scale(3200)
+                        .translate([width / 2, height / 2]);
+
+                    this.path = d3.geoPath().projection(projection);
+
+                    // Updated color scale using reds
+                    this.colorScale = d3.scaleQuantile()
+                        .range([
+                            '#fee5d9',
+                            '#fcbba1',
+                            '#fc9272',
+                            '#fb6a4a',
+                            '#ef3b2c',
+                            '#cb181d',
+                            '#a50f15',
+                            '#67000d'
+                        ]);
+
+                    // Add zoom behavior
+                    this.zoom = d3.zoom()
+                        .scaleExtent([1, 8])
+                        .on("zoom", (event) => {
+                            g.attr("transform", event.transform);
+                            g.selectAll("path").style("stroke-width", `${1 / event.transform.k}px`);
+                        });
+
+                    svg.call(this.zoom);
+
+                    // Create departments
+                    this.mapLayer = g.selectAll("path")
+                        .data(this.geoData.features)
+                        .enter()
+                        .append("path")
+                        .attr("d", this.path)
+                        .attr("class", "department")
+                        .style("vector-effect", "non-scaling-stroke")
+                        .on("mouseover", (event, d) => this.handleDepartmentHover(event, d))
+                        .on("mouseout", this.handleDepartmentMouseOut.bind(this))
+                        .on("click", (event, d) => this.handleDepartmentClick(event, d));
+
+                    // Initialize legend
+                    this.updateMapLegend();
+                    this.updateMapColors();
+
+                } catch (error) {
+                    console.error('Error initializing map:', error);
+                }
+            }
+
+            handleDepartmentHover(event, d) {
+                const accidentsByDept = this.getAccidentsByDepartment(this.currentYear);
+                const currentCount = accidentsByDept[d.properties.code] || 0;
+                const prevYear = this.currentYear - 1;
+                const prevCount = this.getAccidentsByDepartment(prevYear)[d.properties.code] || 0;
+                const change = currentCount - prevCount;
+
+                // Update info panel
+                d3.select("#deptName").text(d.properties.nom);
+                d3.select("#accidentTotal").text(currentCount.toLocaleString());
+
+                // Update variation
+                const changeText = change !== 0 ?
+                    `${change > 0 ? '+' : ''}${change.toLocaleString()}` :
+                    'Aucun changement';
+                d3.select("#accidentChange").text(changeText);
+                d3.select("#accidentChangeYear").text(`variation depuis ${prevYear}`);
+
+                // Update change icon
+                const changeIcon = d3.select("#accidentChangeIcon");
+                if (change !== 0) {
+                    changeIcon.style("display", "inline-block")
+                        .attr("class", change > 0 ? "changeSmallUp" : "changeSmallDown");
+                } else {
+                    changeIcon.style("display", "none");
+                }
+
+                // Highlight department
+                d3.select(event.target)
+                    .style("opacity", 0.8)
+                    .style("stroke-width", "2px");
+            }
+
+            handleDepartmentMouseOut(event) {
+                d3.select(event.target)
+                    .style("opacity", 1)
+                    .style("stroke-width", "0.5px");
+            }
+
+            handleDepartmentClick(event, d) {
+                // Highlight clicked department
+                this.mapLayer.classed("selected-department", false);
+                if (event) {
+                    d3.select(event.target).classed("selected-department", true);
+                }
+            }
+            getAccidentsByDepartment(year) {
+                const accidentsByDept = {};
+                this.data.forEach(accident => {
+                    if (accident.year === year) {
+                        const dept = accident.dep;
+                        accidentsByDept[dept] = (accidentsByDept[dept] || 0) + 1;
+                    }
+                });
+                return accidentsByDept;
+            }
+
+            updateMapColors() {
+                const accidentsByDept = this.getAccidentsByDepartment(this.currentYear);
+
+                // Update color scale domain
+                this.colorScale.domain(Object.values(accidentsByDept));
+
+                // Update department colors
+                this.mapLayer
+                    .transition()
+                    .duration(750)
+                    .style("fill", d => {
+                        const count = accidentsByDept[d.properties.code] || 0;
+                        return this.colorScale(count);
+                    });
+
+                // Update legend
+                this.updateMapLegend();
+            }
+
+            updateMapLegend() {
+                const legend = d3.select("#mapLegend table");
+                const breaks = this.colorScale.quantiles();
+
+                // Clear existing legend items
+                legend.selectAll("tr.legend-item").remove();
+
+                // Add legend items
+                this.colorScale.range().forEach((color, i) => {
+                    const tr = legend.append("tr").attr("class", "legend-item");
+
+                    tr.append("td")
+                        .style("width", "20px")
+                        .append("div")
+                        .style("width", "20px")
+                        .style("height", "20px")
+                        .style("background-color", color)
+                        .style("border", "1px solid rgba(0,0,0,0.2)");
+
+                    let label;
+                    if (i === 0) {
+                        label = `0 - ${Math.round(breaks[0])}`;
+                    } else if (i === breaks.length) {
+                        label = `${Math.round(breaks[breaks.length - 1])}+`;
+                    } else {
+                        label = `${Math.round(breaks[i - 1])} - ${Math.round(breaks[i])}`;
+                    }
+
+                    tr.append("td")
+                        .style("padding-left", "8px")
+                        .text(label);
+                });
+            }
+
+
+
+
+
+
+            handleError(error) {
+                const elements = ['totalValue', 'increaseValue', 'decreaseValue'];
+                elements.forEach(id => {
+                    document.getElementById(id).textContent = 'Error loading data';
+                });
+            }
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const dashboard = new Dashboard();
+            dashboard.initialize();
+        });
     </script>
 </body>
 

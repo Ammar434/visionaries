@@ -1,4 +1,4 @@
-import { DataProcessor } from './dataProcessor.js';
+import { DataProcessor } from './data_processor.js';
 
 async function initializeDashboard() {
     try {

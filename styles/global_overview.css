@@ -16,7 +16,7 @@ body {
     padding: 20px;
     margin-bottom: 20px;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .unhcr-header-title h1 {
@@ -49,15 +49,11 @@ body {
     }
 }
 
-#topRow {
-    margin-top: 20px;
-}
-
 .figure_label {
     margin-bottom: 5px;
 }
 
-.label_main1 {
+.label_main1, .label_main2 {
     font-size: 14px;
     font-weight: bold;
     color: #333;
@@ -67,5 +63,383 @@ body {
     background: #fff;
     padding: 15px;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    height: 100px;
+    position: relative;
+}
+
+.figure_text {
+    font-size: 22px;
+    line-height: 160%;
+    text-align: center;
+}
+
+.changeUp, .changeDown {
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.changeUp {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 16px solid #EF4A60;
+}
+
+.changeDown {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 16px solid #338EC9;
+}
+
+.prev, .next {
+    cursor: pointer;
+    user-select: none;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+    line-height: 24px;
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.prev:hover, .next:hover {
+    background: #e0e0e0;
+}  body {
+    font-family: 'Lato', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+}
+
+#container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.unhcr-header {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.unhcr-header-title h1 {
+    font-size: 24px;
+    margin: 0;
+    color: #333;
+}
+
+.unhcr-header-title h2 {
+    font-size: 20px;
+    margin: 5px 0;
+    color: #666;
+}
+
+.unhcr-header-title h3 {
+    font-size: 16px;
+    margin: 5px 0;
+    color: #888;
+    font-weight: normal;
+}
+
+#mobilemessage {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    #mobilemessage {
+        display: block;
+        margin: 10px 0;
+    }
+}
+
+.figure_label {
+    margin-bottom: 5px;
+}
+
+.label_main1, .label_main2 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+.figure_box {
+    background: #fff;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    height: 100px;
+    position: relative;
+}
+
+.figure_text {
+    font-size: 22px;
+    line-height: 160%;
+    text-align: center;
+}
+
+.changeUp, .changeDown {
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.changeUp {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 16px solid #EF4A60;
+}
+
+.changeDown {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 16px solid #338EC9;
+}
+
+.prev, .next {
+    cursor: pointer;
+    user-select: none;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+    line-height: 24px;
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.prev:hover, .next:hover {
+    background: #e0e0e0;
+}
+
+.chart-container {
+    background: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.chart-title {
+    color: #2185d0;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.chart-subtitle {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.totalGraphDiv, .changeGraphDiv {
+    width: 100%;
+    height: 350px;
+    position: relative;
+}
+
+.axis path {
+    stroke: #E0E0E0;
+}
+
+.axis line {
+    stroke: #E0E0E0;
+}
+
+.axis text {
+    font-size: 12px;
+    fill: #666;
+}
+
+.line {
+    fill: none;
+    stroke-width: 3px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.area {
+    opacity: 0.1;
+}
+
+.dot {
+    fill: #fff;
+    stroke-width: 2px;
+    transition: r 0.2s ease;
+    cursor: pointer;
+}
+
+.dot:hover {
+    r: 7;
+}
+
+.bar {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.bar:hover {
+    opacity: 0.8;
+}
+
+.increase {
+    fill: #EF4A60;
+}
+
+.decrease {
+    fill: #338EC9;
+}
+
+.tooltip {
+    position: absolute;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    pointer-events: none;
+    font-size: 13px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    z-index: 1000;
+}
+
+.tooltip-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.tooltip-value {
+    color: #666;
+}
+
+.grid line {
+    stroke: #E0E0E0;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+
+.grid path {
+    stroke-width: 0;
+}
+
+.selected-year {
+    stroke: #2185d0;
+    stroke-width: 3px;
+    r: 7;
+}
+
+.highlight-bar {
+    opacity: 0.8;
+}
+
+.zero-line {
+    stroke: #999;
+    stroke-dasharray: 4;
+    stroke-width: 1;
+}
+
+.area-gradient stop:first-child {
+    stop-color: #465F7F;
+}
+
+.area-gradient stop:last-child {
+    stop-color: #fff;
+}
+
+.map-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin: 20px 0;
+}
+
+.department {
+    stroke: #fff;
+    stroke-width: 0.5px;
+    transition: opacity 0.2s;
+}
+
+.department:hover {
+    cursor: pointer;
+}
+
+.maplegend {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.map_info {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.zoom-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: white;
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.zoom-controls button {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.zoom-controls button:hover {
+    background: #f0f0f0;
+}
+
+.department {
+    stroke: #fff;
+    stroke-width: 0.5px;
+    transition: all 0.2s;
+}
+
+.department:hover {
+    opacity: 0.8;
+    stroke: #000;
+    stroke-width: 1px;
+}
+
+.selected-department {
+    stroke: #000;
+    stroke-width: 2px !important;
+    opacity: 0.9;
 }
