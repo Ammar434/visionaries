@@ -16,9 +16,9 @@ export default defineConfig({
                 sunburst: resolve(__dirname, 'src/accident_sequences.html'),
             },
             output: {
-                chunkFileNames: 'assets/js/[name]-[hash].js',
-                entryFileNames: 'assets/js/[name]-[hash].js',
-                assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
+                // chunkFileNames: 'assets/js/[name]-[hash].js',
+                // entryFileNames: 'assets/js/[name]-[hash].js',
+                // assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
             }
         },
         minify: 'esbuild',

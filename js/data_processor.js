@@ -7,6 +7,8 @@ export class DataProcessor {
         this.aggregatedBicycleAccidents = [];
         this.startYear = 2005;
         this.endYear = 2023;
+        this.basePath = true ? '' : '/visionaries';
+
     }
 
     async loadAllYearsData() {
@@ -42,7 +44,6 @@ export class DataProcessor {
             };
         } catch (error) {
             this.logger.error(`Error loading data for year ${year}:`, error);
-            // Continue with other years if one fails
             this.yearlyData[year] = null;
         }
     }
@@ -50,7 +51,7 @@ export class DataProcessor {
     async loadCSVFile(year, filePrefix) {
         const filename = `${filePrefix}-${year}.csv`;
         try {
-            const response = await fetch(`/data/${year}/${filename}`);
+            const response = await fetch(`${this.basePath}/data/${year}/${filename}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
