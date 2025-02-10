@@ -7,8 +7,7 @@ export class DataProcessor {
         this.aggregatedBicycleAccidents = [];
         this.startYear = 2005;
         this.endYear = 2023;
-        this.basePath = true ? '' : '/visionaries';
-
+        this.baseUrl = import.meta.env.BASE_URL || '/visionaries/';
     }
 
     async loadAllYearsData() {
@@ -50,8 +49,11 @@ export class DataProcessor {
 
     async loadCSVFile(year, filePrefix) {
         const filename = `${filePrefix}-${year}.csv`;
+        const url = new URL(`${this.baseUrl}data/${year}/${filename}`, window.location.origin).href;
+
         try {
-            const response = await fetch(`${this.basePath}/data/${year}/${filename}`);
+
+            const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

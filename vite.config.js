@@ -14,27 +14,45 @@ export default defineConfig({
                 main: resolve(__dirname, 'index.html'),
                 global: resolve(__dirname, 'src/global_overview.html'),
                 sunburst: resolve(__dirname, 'src/accident_sequences.html'),
+                scripts: resolve(__dirname, 'scripts.js') // Added scripts.js
             },
             output: {
-                chunkFileNames: 'assets/js/[name]-[hash].js',
-                entryFileNames: 'assets/js/[name]-[hash].js',
+                // Organize output files into directories
+                chunkFileNames: 'js/[name]-[hash].js',
+                entryFileNames: 'js/[name]-[hash].js',
                 assetFileNames: ({ name }) => {
                     if (/\.css$/.test(name ?? '')) {
-                        return 'assets/css/[name]-[hash][extname]';
+                        return 'css/[name]-[hash][extname]';
                     }
-                    return 'assets/[ext]/[name]-[hash][extname]';
+                    if (/\.(png|jpe?g|gif|svg|webp)$/.test(name ?? '')) {
+                        return 'images/[name]-[hash][extname]';
+                    }
+                    return 'assets/[name]-[hash][extname]';
                 }
             }
         },
         minify: 'esbuild',
         sourcemap: true
     },
-    publicDir: 'public',
     base: '/visionaries/',
+    publicDir: 'public',
     resolve: {
         alias: {
             '@': resolve(__dirname, './src'),
-            '@styles': resolve(__dirname, './styles')
+            '@styles': resolve(__dirname, './styles'),
+            '@images': resolve(__dirname, './images'),
+            '@public': resolve(__dirname, './public')
+        }
+    },
+    css: {
+        // Add preprocessor options if needed
+        preprocessorOptions: {
+            // Add any CSS preprocessor options here
+        },
+        // Ensure CSS modules work correctly
+        modules: {
+            scopeBehavior: 'local',
+            localsConvention: 'camelCase'
         }
     }
-})
+});
