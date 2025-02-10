@@ -4,66 +4,103 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Vizionaries</title>
-    <meta name="description" content="The site for our project!">
-    <!-- Update image and stylesheet paths to use the base URL -->
-    <link rel="icon" href="/visionaries/images/icon.png">
-    <link rel="stylesheet" href="/styles/styles.css">
+    <title>Vizionaries - Cycling Accident Analysis</title>
+    <meta name="description" content="Comprehensive analysis of cycling accidents in France and infrastructure impact">
+    <link rel="icon" type="image/png" href="./images/icon.png">
+    <link rel="stylesheet" href="./styles/styles.css">
 </head>
 
 <body>
     <div class="header-title">
         <h1>VIZIONARIES</h1>
         <div>
-            <h2>Cycling accidents</h2>
-            <h3>To what extent does the development of cycling infrastructure help reduce the number and severity of
-                cycling accidents?</h3>
+            <h2>Cycling Accidents Analysis Platform</h2>
+            <h3>Understanding the Impact of Infrastructure on Cycling Safety in France (2005-2023)</h3>
         </div>
     </div>
 
     <div class="row">
         <div class="column_home">
-            <a href="/visionaries/" class="nav-button">The Data</a>
+            <a href="./" class="nav-button">The Data</a>
         </div>
-
         <div class="column_home">
-            <a href="/visionaries/src/global_overview.html" class="nav-button">Global Overview</a>
+            <a href="./src/global_overview.html" class="nav-button">Global Overview</a>
         </div>
-
         <div class="column_home">
-            <a href="/visionaries/src/accident_sequences.html" class="nav-button">Sunburst</a>
+            <a href="./src/accident_sequences.html" class="nav-button">Detailed Analysis</a>
         </div>
     </div>
 
     <div class="project-description">
-        <section>
-            <h2>About the Project</h2>
+        <section class="audience-section">
+            <h2>Who is this for?</h2>
+            <ul>
+                <li><strong>Urban Planners & Policy Makers:</strong> For evidence-based infrastructure decisions</li>
+                <li><strong>Cycling Advocates:</strong> To support safety improvement initiatives</li>
+                <li><strong>Researchers:</strong> For detailed accident pattern analysis</li>
+                <li><strong>General Public:</strong> To understand cycling safety in their areas</li>
+            </ul>
+        </section>
+
+        <section class="importance-section">
+            <h2>Why This Matters</h2>
             <p>
-                Our project analyzes cycling accidents in France to understand the relationship between
-                cycling infrastructure and safety. Using comprehensive data from official sources, we visualize patterns
-                and trends to identify how infrastructure development impacts accident rates and severity.
+                As cycling becomes increasingly popular for both commuting and leisure:
+            <ul>
+                <li>Understanding accident patterns helps prevent future incidents</li>
+                <li>Identifying high-risk areas guides infrastructure improvements</li>
+                <li>Data-driven insights lead to more effective safety measures</li>
+                <li>Better infrastructure planning can save lives and promote cycling</li>
+            </ul>
             </p>
         </section>
 
-        <section>
-            <h2>Data Collection</h2>
+        <section class="visualization-guide">
+            <h2>How to Use Our Visualizations</h2>
+
+            <div class="view-description">
+                <h3>1. Global Overview</h3>
+                <p>
+                    Quick insights and trends:
+                <ul>
+                    <li>Year-by-year accident statistics</li>
+                    <li>Geographic distribution across France</li>
+                    <li>Perfect for quick assessments and general patterns</li>
+                </ul>
+                </p>
+            </div>
+
+            <div class="view-description">
+                <h3>2. Detailed Sunburst Analysis</h3>
+                <p>
+                    Deep dive into accident circumstances:
+                <ul>
+                    <li>Interactive exploration of accident factors</li>
+                    <li>Hierarchical view of accident conditions</li>
+                    <li>Detailed breakdown of circumstances</li>
+                    <li>Ideal for understanding complex relationships between factors</li>
+                </ul>
+                </p>
+            </div>
+        </section>
+
+        <section class="data-section">
+            <h2>Our Data</h2>
             <p>
-                Our analysis uses official accident data from the French government's road safety database (BAAC -
-                Bulletin d'Analyse des Accidents Corporels). This database provides detailed information about each
-                accident, including location, severity, circumstances, and infrastructure conditions.
+                Analysis based on the BAAC (Bulletin d'Analyse des Accidents Corporels) database:
+            <ul>
+                <li>18 years of comprehensive accident data (2005-2023)</li>
+                <li>Detailed information about each incident</li>
+                <li>Regular updates from official sources</li>
+                <li>Coverage across all French departments</li>
+            </ul>
             </p>
         </section>
 
-        <section>
-            <h2>Technologies Used</h2>
-            <p>
-                This visualization platform employs modern web technologies including D3.js for dynamic data
-                visualization,
-                PapaParse for CSV data processing, and JavaScript (ES6+) for data analysis.
-            </p>
-        </section>
+
     </div>
 
+    <script type="module" src="./scripts.js"></script>
 </body>
 
 </html>
