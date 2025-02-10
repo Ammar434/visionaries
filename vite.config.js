@@ -14,7 +14,6 @@ export default defineConfig({
                 main: resolve(__dirname, 'index.html'),
                 global: resolve(__dirname, 'src/global_overview.html'),
                 sunburst: resolve(__dirname, 'src/accident_sequences.html'),
-                scripts: resolve(__dirname, 'scripts.js') // Added scripts.js
             },
             output: {
                 // Organize output files into directories
@@ -34,7 +33,7 @@ export default defineConfig({
         minify: 'esbuild',
         sourcemap: true
     },
-    base: '/visionaries/',
+    base: './',
     publicDir: 'public',
     resolve: {
         alias: {
@@ -45,11 +44,8 @@ export default defineConfig({
         }
     },
     css: {
-        // Add preprocessor options if needed
         preprocessorOptions: {
-            // Add any CSS preprocessor options here
         },
-        // Ensure CSS modules work correctly
         modules: {
             scopeBehavior: 'local',
             localsConvention: 'camelCase'
