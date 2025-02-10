@@ -16,9 +16,14 @@ export default defineConfig({
                 sunburst: resolve(__dirname, 'src/accident_sequences.html'),
             },
             output: {
-                // chunkFileNames: 'assets/js/[name]-[hash].js',
-                // entryFileNames: 'assets/js/[name]-[hash].js',
-                // assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
+                chunkFileNames: 'assets/js/[name]-[hash].js',
+                entryFileNames: 'assets/js/[name]-[hash].js',
+                assetFileNames: ({ name }) => {
+                    if (/\.css$/.test(name ?? '')) {
+                        return 'assets/css/[name]-[hash][extname]';
+                    }
+                    return 'assets/[ext]/[name]-[hash][extname]';
+                }
             }
         },
         minify: 'esbuild',
@@ -28,7 +33,8 @@ export default defineConfig({
     base: '/visionaries/',
     resolve: {
         alias: {
-            '@': resolve(__dirname, './src')
+            '@': resolve(__dirname, './src'),
+            '@styles': resolve(__dirname, './styles')
         }
     }
 })
