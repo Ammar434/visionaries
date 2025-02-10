@@ -8,7 +8,23 @@ export default defineConfig({
     },
     build: {
         outDir: 'dist',
-        assetsDir: 'assets'
+        assetsDir: 'assets',
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'd3': ['d3'],
+                    'vendor': ['papaparse']
+                }
+            }
+        },
+        minify: 'terser',
+        sourcemap: true
     },
-    publicDir: 'public'
+    publicDir: 'public',
+    base: '/visionaries/',
+    resolve: {
+        alias: {
+            '@': resolve(__dirname, './src')
+        }
+    }
 })
