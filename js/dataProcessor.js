@@ -3,44 +3,54 @@ import Papa from 'papaparse';
 export class DataProcessor {
     constructor(options = {}) {
         this.logger = options.logger || console;
-        this.data = {
-            caracteristiques: [],
-            vehicules: [],
-            usagers: [],
-            lieux: []
-        };
-        this.bicycleAccidents = [];
+        this.yearlyData = {};
+        this.aggregatedBicycleAccidents = [];
+        this.startYear = 2005;
+        this.endYear = 2023;
     }
 
-    async loadData() {
-        this.logger.log('Starting loadData method');
-        const year = 2022;
+    async loadAllYearsData() {
+        this.logger.log('Starting to load data for all years');
 
         try {
-            const csvFiles = await Promise.all([
-                this.loadCSVFile(`clean-caracteristiques-${year}.csv`),
-                this.loadCSVFile(`clean-vehicules-${year}.csv`),
-                this.loadCSVFile(`clean-usagers-${year}.csv`),
-                this.loadCSVFile(`clean-lieux-${year}.csv`)
-            ]);
+            for (let year = this.startYear; year <= this.endYear; year++) {
+                this.logger.log(`Loading data for year ${year}`);
+                await this.loadYearData(year);
+            }
 
-            [
-                this.data.caracteristiques,
-                this.data.vehicules,
-                this.data.usagers,
-                this.data.lieux
-            ] = csvFiles;
-
-            return this.processBicycleAccidents();
+            return this.processAllYearsBicycleAccidents();
         } catch (error) {
-            this.logger.error('Error loading data:', error);
+            this.logger.error('Error loading multi-year data:', error);
             throw error;
         }
     }
 
-    async loadCSVFile(filename) {
+    async loadYearData(year) {
         try {
-            const response = await fetch(`/data/2022/${filename}`);
+            const csvFiles = await Promise.all([
+                this.loadCSVFile(year, 'clean-caracteristiques'),
+                this.loadCSVFile(year, 'clean-vehicules'),
+                this.loadCSVFile(year, 'clean-usagers'),
+                this.loadCSVFile(year, 'clean-lieux')
+            ]);
+
+            this.yearlyData[year] = {
+                caracteristiques: csvFiles[0],
+                vehicules: csvFiles[1],
+                usagers: csvFiles[2],
+                lieux: csvFiles[3]
+            };
+        } catch (error) {
+            this.logger.error(`Error loading data for year ${year}:`, error);
+            // Continue with other years if one fails
+            this.yearlyData[year] = null;
+        }
+    }
+
+    async loadCSVFile(year, filePrefix) {
+        const filename = `${filePrefix}-${year}.csv`;
+        try {
+            const response = await fetch(`/data/${year}/${filename}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -56,7 +66,7 @@ export class DataProcessor {
         const results = Papa.parse(csvText, {
             header: true,
             delimiter: ';',
-            dynamicTyping: false, // Changed to false to keep everything as strings
+            dynamicTyping: false,
             skipEmptyLines: true,
             transformHeader: header => header.trim()
         });
@@ -73,101 +83,108 @@ export class DataProcessor {
         return id.toString().trim();
     }
 
+    processAllYearsBicycleAccidents() {
+        this.aggregatedBicycleAccidents = [];
 
-    // In your DataProcessor class, modify the processBicycleAccidents method:
-    processBicycleAccidents() {
-        // First, normalize all IDs in vehicules data
-        const bicycleVehicles = this.data.vehicules.filter(v =>
-            v.catv && ['1', '01'].includes(v.catv.toString().trim())
-        );
+        Object.entries(this.yearlyData).forEach(([year, yearData]) => {
+            if (!yearData) return; // Skip years with failed data loading
+            const bicycleVehicles = yearData.vehicules.filter(v =>
+                v.catv && ['1', '01'].includes(v.catv.toString().trim())
+            );
 
-        // Create a Set of normalized bicycle accident IDs
-        const bicycleAccidentIds = new Set(
-            bicycleVehicles.map(v => this.normalizeId(v.Num_Acc))
-        );
+            const bicycleAccidentIds = new Set(
+                bicycleVehicles.map(v => this.normalizeId(v.Num_Acc))
+            );
 
-        // Helper function to parse French-formatted numbers
-        const parseFrenchnumber = (str) => {
-            if (!str) return null;
-            // Replace comma with period and convert to float
-            return parseFloat(str.toString().trim().replace(',', '.'));
-        };
+            const yearAccidents = yearData.caracteristiques
+                .filter(acc => bicycleAccidentIds.has(this.normalizeId(acc.Num_Acc)))
+                .map(acc => {
+                    const normalizedId = this.normalizeId(acc.Num_Acc);
+                    const lieuxInfo = yearData.lieux.find(l =>
+                        this.normalizeId(l.Num_Acc) === normalizedId
+                    );
+                    const usagersInfo = yearData.usagers.filter(u =>
+                        this.normalizeId(u.Num_Acc) === normalizedId
+                    );
 
-        // Process accidents using normalized IDs
-        this.bicycleAccidents = this.data.caracteristiques
-            .filter(acc => {
-                const normalizedId = this.normalizeId(acc.Accident_Id);
-                return bicycleAccidentIds.has(normalizedId);
-            })
-            .map(acc => {
-                const normalizedId = this.normalizeId(acc.Accident_Id);
-                const lieuxInfo = this.data.lieux.find(l =>
-                    this.normalizeId(l.Num_Acc) === normalizedId
-                );
-                const usagersInfo = this.data.usagers.filter(u =>
-                    this.normalizeId(u.Num_Acc) === normalizedId
-                );
+                    const lat = this.parseFrenchnumber(acc.lat);
+                    const long = this.parseFrenchnumber(acc.long);
 
-                // Parse coordinates properly
-                const lat = parseFrenchnumber(acc.lat);
-                const long = parseFrenchnumber(acc.long);
+                    return {
+                        ...acc,
+                        year: parseInt(year),
+                        lat,
+                        long,
+                        users: usagersInfo,
+                        location_details: lieuxInfo
+                    };
+                });
+            this.logger.log(yearAccidents)
 
-                return {
-                    ...acc,
-                    lat: lat,  // Now properly parsed
-                    long: long, // Now properly parsed
-                    users: usagersInfo,
-                    location_details: lieuxInfo
-                };
-            });
+            this.aggregatedBicycleAccidents.push(...yearAccidents);
+        });
 
-        return this.bicycleAccidents;
+        return this.aggregatedBicycleAccidents;
     }
 
-    getAccidentsByMonth() {
-        return this.bicycleAccidents.reduce((acc, accident) => {
+    parseFrenchnumber(str) {
+        if (!str) return null;
+        return parseFloat(str.toString().trim().replace(',', '.'));
+    }
+
+    // Enhanced analysis methods for multi-year data
+    getAccidentsByYearAndMonth() {
+        return this.aggregatedBicycleAccidents.reduce((acc, accident) => {
+            const year = accident.year || 'unknown';
             const month = accident.mois || 'unknown';
-            acc[month] = (acc[month] || 0) + 1;
+            acc[year] = acc[year] || {};
+            acc[year][month] = (acc[year][month] || 0) + 1;
             return acc;
         }, {});
     }
 
-    getAccidentsByGravity() {
-        return this.bicycleAccidents.reduce((acc, accident) => {
+    getAccidentsByYearAndGravity() {
+        return this.aggregatedBicycleAccidents.reduce((acc, accident) => {
+            const year = accident.year || 'unknown';
             const gravity = accident.grav || 'unknown';
-            acc[gravity] = (acc[gravity] || 0) + 1;
+            acc[year] = acc[year] || {};
+            acc[year][gravity] = (acc[year][gravity] || 0) + 1;
             return acc;
         }, {});
     }
 
-    getGeographicCluster(precision = 2) {
-        return this.bicycleAccidents.reduce((clusters, accident) => {
+    getGeographicClustersByYear(precision = 2) {
+        return this.aggregatedBicycleAccidents.reduce((acc, accident) => {
+            const year = accident.year || 'unknown';
             const latCluster = accident.lat;
             const longCluster = accident.long;
             const key = `${latCluster},${longCluster}`;
-            clusters[key] = (clusters[key] || 0) + 1;
-            return clusters;
+
+            acc[year] = acc[year] || {};
+            acc[year][key] = (acc[year][key] || 0) + 1;
+            return acc;
         }, {});
     }
 
-    getUserDemographics() {
-        const userTypes = {};
-        const ageGroups = {};
+    getUserDemographicsByYear() {
+        return this.aggregatedBicycleAccidents.reduce((acc, accident) => {
+            const year = accident.year || 'unknown';
+            acc[year] = acc[year] || { userTypes: {}, ageGroups: {} };
 
-        this.bicycleAccidents.forEach(accident => {
             accident.users.forEach(user => {
                 const userType = user.catu || 'unknown';
-                userTypes[userType] = (userTypes[userType] || 0) + 1;
-
                 const age = user.age;
+
+                acc[year].userTypes[userType] = (acc[year].userTypes[userType] || 0) + 1;
+
                 if (age !== null && age !== undefined) {
                     const ageGroup = this.categorizeAge(age);
-                    ageGroups[ageGroup] = (ageGroups[ageGroup] || 0) + 1;
+                    acc[year].ageGroups[ageGroup] = (acc[year].ageGroups[ageGroup] || 0) + 1;
                 }
             });
-        });
 
-        return { userTypes, ageGroups };
+            return acc;
+        }, {});
     }
 
     categorizeAge(age) {
@@ -180,12 +197,41 @@ export class DataProcessor {
         return '65+';
     }
 
-    analyzeAccidentTrends() {
+    getYearlyTrends() {
         return {
-            byMonth: this.getAccidentsByMonth(),
-            byGravity: this.getAccidentsByGravity(),
-            geographicClusters: this.getGeographicCluster(),
-            userDemographics: this.getUserDemographics()
+            byYearAndMonth: this.getAccidentsByYearAndMonth(),
+            byYearAndGravity: this.getAccidentsByYearAndGravity(),
+            geographicClustersByYear: this.getGeographicClustersByYear(),
+            userDemographicsByYear: this.getUserDemographicsByYear()
         };
+    }
+
+    // Additional analysis methods
+    getTotalAccidentsByYear() {
+        return this.aggregatedBicycleAccidents.reduce((acc, accident) => {
+            const year = accident.year || 'unknown';
+            acc[year] = (acc[year] || 0) + 1;
+            return acc;
+        }, {});
+    }
+
+    getAverageGravityByYear() {
+        const gravityCount = {};
+        const gravitySum = {};
+
+        this.aggregatedBicycleAccidents.forEach(accident => {
+            const year = accident.year || 'unknown';
+            const gravity = parseInt(accident.grav);
+
+            if (!isNaN(gravity)) {
+                gravityCount[year] = (gravityCount[year] || 0) + 1;
+                gravitySum[year] = (gravitySum[year] || 0) + gravity;
+            }
+        });
+
+        return Object.keys(gravityCount).reduce((acc, year) => {
+            acc[year] = gravitySum[year] / gravityCount[year];
+            return acc;
+        }, {});
     }
 }
