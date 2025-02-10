@@ -23,10 +23,13 @@
   },
   "homepage": "https://github.com/Ammar434/visionaries#readme",
   "dependencies": {
+    "@vercel/analytics": "^1.5.0",
     "d3": "^7.9.0",
     "papaparse": "^5.4.1",
     "process": "^0.11.10",
     "vite": "^6.0.11"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "terser": "^5.38.1"
+  }
 }

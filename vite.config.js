@@ -10,14 +10,18 @@ export default defineConfig({
         outDir: 'dist',
         assetsDir: 'assets',
         rollupOptions: {
+            input: {
+                main: resolve(__dirname, 'index.html'),
+                global: resolve(__dirname, 'src/global_overview.html'),
+                sunburst: resolve(__dirname, 'src/accident_sequences.html'),
+            },
             output: {
-                manualChunks: {
-                    'd3': ['d3'],
-                    'vendor': ['papaparse']
-                }
+                chunkFileNames: 'assets/js/[name]-[hash].js',
+                entryFileNames: 'assets/js/[name]-[hash].js',
+                assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
             }
         },
-        minify: 'terser',
+        minify: 'esbuild',
         sourcemap: true
     },
     publicDir: 'public',
