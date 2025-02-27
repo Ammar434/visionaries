@@ -2,104 +2,1383 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Vizionaries - Cycling Accident Analysis</title>
-    <meta name="description" content="Comprehensive analysis of cycling accidents in France and infrastructure impact">
-    <link rel="icon" type="image/png" href="/images/icon.png">
-    <link rel="stylesheet" href="/styles/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vélo Sécurité | Understanding Bicycle Accidents</title>
+    <style>
+        /* Modern CSS Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            color: #1a1a2e;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* Layout */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        section {
+            padding: 5rem 0;
+        }
+
+        /* Header */
+        header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0052cc;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo svg {
+            margin-right: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #0052cc;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #0052cc;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #003d99;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            background-color: #f8f9fa;
+            overflow: hidden;
+            margin-top: 70px;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-stats {
+            display: flex;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            margin-right: 3rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0052cc;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .hero-animation {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50%;
+            height: 80%;
+            z-index: 1;
+        }
+
+        /* Key Insights Section */
+        .key-insights {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            margin-top: -100px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .insights-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .insight-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .insight-icon {
+            font-size: 2rem;
+            color: #0052cc;
+            margin-bottom: 1rem;
+        }
+
+        /* Viz Preview Section */
+        .viz-preview {
+            background-color: #f0f5ff;
+            overflow: hidden;
+        }
+
+        .viz-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .viz-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4rem;
+            width: 100%;
+        }
+
+        .viz-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .viz-content {
+            flex: 1;
+            padding: 0 2rem;
+        }
+
+        .viz-chart {
+            flex: 1;
+            height: 300px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* CTA Section */
+        .cta {
+            text-align: center;
+            background-color: #1a1a2e;
+            color: white;
+        }
+
+        .cta h2 {
+            color: white;
+        }
+
+        .cta .btn {
+            background-color: #e63946;
+            margin-top: 1rem;
+        }
+
+        .cta .btn:hover {
+            background-color: #c1121f;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #f8f9fa;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            margin: 0 1rem;
+            color: #666;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: #0052cc;
+        }
+
+        .copyright {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* Animation for scrolling */
+        .scroll-animation {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s, transform 0.6s;
+        }
+
+        .scroll-animation.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .hero-animation {
+                opacity: 0.2;
+                width: 100%;
+            }
+
+            .hero-content {
+                max-width: 100%;
+            }
+
+            .viz-item {
+                flex-direction: column !important;
+            }
+
+            .viz-chart {
+                width: 100%;
+                margin-top: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* Chart Styles */
+        #yearlyTrendChart,
+        #gravityChart,
+        #timeOfDayChart {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Animation for bicycle icon */
+        @keyframes ride {
+            0% {
+                transform: translateX(-300%) rotate(0deg);
+            }
+
+            100% {
+                transform: translateX(300%) rotate(0deg);
+            }
+        }
+
+        .bicycle-animation {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            animation: ride 15s linear infinite;
+            font-size: 2rem;
+        }
+
+        /* Loader styles */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: 2000;
+            transition: opacity 0.3s ease-out;
+        }
+
+        .loader {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .loader div {
+            position: absolute;
+            border: 4px solid #0052cc;
+            opacity: 1;
+            border-radius: 50%;
+            animation: loader 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+        }
+
+        .loader div:nth-child(2) {
+            animation-delay: -0.5s;
+        }
+
+        .loader-text {
+            position: absolute;
+            top: calc(50% + 50px);
+            font-weight: 500;
+            color: #0052cc;
+        }
+
+        @keyframes loader {
+            0% {
+                top: 36px;
+                left: 36px;
+                width: 0;
+                height: 0;
+                opacity: 0;
+            }
+
+            4.9% {
+                top: 36px;
+                left: 36px;
+                width: 0;
+                height: 0;
+                opacity: 0;
+            }
+
+            5% {
+                top: 36px;
+                left: 36px;
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+
+            100% {
+                top: 0px;
+                left: 0px;
+                width: 72px;
+                height: 72px;
+                opacity: 0;
+            }
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="header-title">
-        <h1>VIZIONARIES</h1>
-        <div>
-            <h2>Cycling Accidents Analysis Platform</h2>
-            <h3>Understanding the Impact of Infrastructure on Cycling Safety in France (2005-2023)</h3>
+    <div id="loaderContainer" class="loader-container">
+        <div class="loader">
+            <div></div>
+            <div></div>
         </div>
+        <div class="loader-text">Loading bicycle accident data...</div>
+
     </div>
 
-    <div class="row">
-        <div class="column_home">
-            <a href="./" class="nav-button">The Data</a>
-        </div>
-        <div class="column_home">
-            <a href="./src/global_overview.html" class="nav-button">Global Overview</a>
-        </div>
-        <div class="column_home">
-            <a href="./src/accident_sequences.html" class="nav-button">Detailed Analysis</a>
-        </div>
-    </div>
 
-    <div class="project-description">
-        <section class="audience-section">
-            <h2>Who is this for?</h2>
-            <ul>
-                <li><strong>Urban Planners & Policy Makers:</strong> For evidence-based infrastructure decisions</li>
-                <li><strong>Cycling Advocates:</strong> To support safety improvement initiatives</li>
-                <li><strong>Researchers:</strong> For detailed accident pattern analysis</li>
-                <li><strong>General Public:</strong> To understand cycling safety in their areas</li>
-            </ul>
-        </section>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M15.5 5.5C15.5 6.33 14.83 7 14 7C13.17 7 12.5 6.33 12.5 5.5C12.5 4.67 13.17 4 14 4C14.83 4 15.5 4.67 15.5 5.5Z"
+                            fill="#0052CC" />
+                        <path d="M5 12L9.5 6.5M18 12L13.5 6.5M8 17L12 12L16 17" stroke="#0052CC" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                            d="M5 22C7.20914 22 9 20.2091 9 18C9 15.7909 7.20914 14 5 14C2.79086 14 1 15.7909 1 18C1 20.2091 2.79086 22 5 22Z"
+                            stroke="#0052CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                            d="M19 22C21.2091 22 23 20.2091 23 18C23 15.7909 21.2091 14 19 14C16.7909 14 15 15.7909 15 18C15 20.2091 16.7909 22 19 22Z"
+                            stroke="#0052CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Vélo Sécurité
+                </a>
+                <ul class="nav-links">
 
-        <section class="importance-section">
-            <h2>Why This Matters</h2>
-            <p>
-                As cycling becomes increasingly popular for both commuting and leisure:
-            <ul>
-                <li>Understanding accident patterns helps prevent future incidents</li>
-                <li>Identifying high-risk areas guides infrastructure improvements</li>
-                <li>Data-driven insights lead to more effective safety measures</li>
-                <li>Better infrastructure planning can save lives and promote cycling</li>
-            </ul>
-            </p>
-        </section>
-
-        <section class="visualization-guide">
-            <h2>How to Use Our Visualizations</h2>
-
-            <div class="view-description">
-                <h3>1. Global Overview</h3>
-                <p>
-                    Quick insights and trends:
-                <ul>
-                    <li>Year-by-year accident statistics</li>
-                    <li>Geographic distribution across France</li>
-                    <li>Perfect for quick assessments and general patterns</li>
+                    <!-- <li><a href="#insights">Insights</a></li> -->
+                    <!-- <li><a href="#visualizations">Visualizations</a></li> -->
+                    <li><a href="./src/accident_sequences.html" class="btn">Explore Data</a></li>
                 </ul>
-                </p>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content scroll-animation">
+                <h1>Understanding Bicycle Accidents in France</h1>
+                <p>Explore comprehensive data on bicycle accidents across France from 2005 to 2023. Discover patterns,
+                    risk factors, and trends to help make cycling safer for everyone.</p>
+
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalAccidents">0</span>
+                        <span class="stat-label">Bicycle Accidents</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="yearsCovered">19</span>
+                        <span class="stat-label">Years of Data</span>
+                    </div>
+                </div>
+
+                <a href="./src/accident_sequences.html" class="btn">Explore Visualizations</a>
             </div>
+        </div>
+        <div class="hero-animation" id="mapAnimation"></div>
+        <div class="bicycle-animation">🚲</div>
+    </section>
 
-            <div class="view-description">
-                <h3>2. Detailed Sunburst Analysis</h3>
-                <p>
-                    Deep dive into accident circumstances:
-                <ul>
-                    <li>Interactive exploration of accident factors</li>
-                    <li>Hierarchical view of accident conditions</li>
-                    <li>Detailed breakdown of circumstances</li>
-                    <li>Ideal for understanding complex relationships between factors</li>
-                </ul>
-                </p>
+    <section class="key-insights" id="insights">
+        <div class="container">
+            <h2 class="scroll-animation">Key Insights</h2>
+            <div class="insights-container">
+                <div class="insight-card scroll-animation">
+                    <div class="insight-icon">📅</div>
+                    <h3>Seasonal Patterns</h3>
+                    <p>Bicycle accidents show clear seasonal patterns, with peaks during summer months when cycling
+                        activity increases across France.</p>
+                </div>
+                <div class="insight-card scroll-animation">
+                    <div class="insight-icon">🏙️</div>
+                    <h3>Urban Concentration</h3>
+                    <p>Most bicycle accidents occur in urban areas, particularly in city centers where bicycle traffic
+                        interacts with dense vehicle networks.</p>
+                </div>
+                <div class="insight-card scroll-animation">
+                    <div class="insight-icon">⏰</div>
+                    <h3>Time of Day Impact</h3>
+                    <p>Peak commuting hours show the highest accident rates, with evening rush hour presenting
+                        particular risks for cyclists.</p>
+                </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="data-section">
-            <h2>Our Data</h2>
-            <p>
-                Analysis based on the BAAC (Bulletin d'Analyse des Accidents Corporels) database:
-            <ul>
-                <li>18 years of comprehensive accident data (2005-2023)</li>
-                <li>Detailed information about each incident</li>
-                <li>Regular updates from official sources</li>
-                <li>Coverage across all French departments</li>
-            </ul>
-            </p>
-        </section>
+    <section class="viz-preview" id="visualizations">
+        <div class="container">
+            <h2 class="scroll-animation">Data Visualizations</h2>
+            <div class="viz-container">
+                <div class="viz-item scroll-animation">
+                    <div class="viz-content">
+                        <h3>Yearly Trends (2005-2023)</h3>
+                        <p>Examine how bicycle accident rates have evolved over nearly two decades. Has infrastructure
+                            improvement impacted safety?</p>
+                        <!-- <a href="#" class="btn">Explore Trend Analysis</a> -->
+                    </div>
+                    <div class="viz-chart">
+                        <div id="yearlyTrendChart"></div>
+                    </div>
+                </div>
+
+                <div class="viz-item scroll-animation">
+                    <div class="viz-content">
+                        <h3>Accident Severity Analysis</h3>
+                        <p>Understand the distribution of accident severity and how different factors contribute to more
+                            serious incidents.</p>
+                        <!-- <a href="#" class="btn">Explore Severity Factors</a> -->
+                    </div>
+                    <div class="viz-chart">
+                        <div id="gravityChart"></div>
+                    </div>
+                </div>
+
+                <div class="viz-item scroll-animation">
+                    <div class="viz-content">
+                        <h3>Time & Location Patterns</h3>
+                        <p>Discover when and where accidents are most likely to occur, helping cyclists make informed
+                            decisions about routes and timing.</p>
+                        <!-- <a href="#" class="btn">Explore Spatial Data</a> -->
+                    </div>
+                    <div class="viz-chart">
+                        <div id="timeOfDayChart"></div>
+                    </div>
+                </div>
+                <div class="viz-item scroll-animation">
+                    <div class="viz-content">
+                        <h3>Seasonal Patterns</h3>
+                        <p>Discover how bicycle accidents are distributed throughout the year. Which months present the
+                            highest risk for cyclists?</p>
+                        <!-- <a href="#" class="btn">Explore Seasonal Analysis</a> -->
+                    </div>
+                    <div class="viz-chart">
+                        <div id="seasonalPatternsChart"></div>
+                    </div>
+                </div>
+
+                <!-- Add this for the Urban vs Rural Chart -->
+                <div class="viz-item scroll-animation">
+                    <div class="viz-content">
+                        <h3>Urban vs Rural Distribution</h3>
+                        <p>Compare the prevalence of bicycle accidents between urban and rural areas to understand where
+                            safety measures are most needed.</p>
+                        <!-- <a href="#" class="btn">Explore Location Analysis</a> -->
+                    </div>
+                    <div class="viz-chart">
+                        <div id="urbanRuralChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container scroll-animation">
+            <h2>Ready to Explore the Complete Dataset?</h2>
+            <p>Dive deeper into our interactive dashboards and discover insights that could help improve bicycle safety
+                across France.</p>
+            <a href="./src/accident_sequences.html" class="btn">Access Full Dashboard</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">About the Project</a>
+                <a href="#">Methodology</a>
+                <a href="#">Data Sources</a>
+                <a href="#">Contact</a>
+            </div>
+            <p class="copyright">© 2025 Vélo Sécurité. Data provided by Observatoire national interministériel de la
+                sécurité routière.</p>
+        </div>
+    </footer>
+
+    <!-- Include external scripts for data visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script type="module">
+        import { DataProcessor } from './js/data_processor.js';
+        let dataProcessor;
+        let yearlyData = [];
+        let severityData = [];
+        let timeData = [];
+        let totalAccidents = 0;
+
+        // Show/hide loader functions
+        function showLoader() {
+            document.getElementById('loaderContainer').classList.remove('hidden');
+        }
+
+        function hideLoader() {
+            document.getElementById('loaderContainer').classList.add('hidden');
+        }
+
+        // Function to update the loader text
+        function updateLoaderText(text) {
+            document.querySelector('.loader-text').textContent = text;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Show loader before initializing
+            showLoader();
+
+            // Initialize DataProcessor
+            dataProcessor = new DataProcessor();
+
+            // Load data and then create visualizations only if successful
+            loadData()
+                .then(success => {
+                    if (success) {
+                        // Update statistics counter with animation
+                        animateCounter('totalAccidents', totalAccidents);
+
+                        // Create visualizations
+                        createYearlyTrendChart();
+                        createGravityChart();
+                        createTimeOfDayChart();
+                        createSeasonalPatternsChart();
+                        createUrbanRuralChart();
+
+                        // Initialize scroll animations
+                        initScrollAnimations();
+                    } else {
+                        // Handle case when loading fails but we don't want to use fallback data
+                        displayDataLoadingError();
+                    }
+                })
+                .catch(error => {
+                    console.error("Fatal error loading data:", error);
+                    displayDataLoadingError();
+                })
+                .finally(() => {
+                    // Always hide the loader when done
+                    hideLoader();
+                });
+        });
+        // Display error message when data loading fails
+        function displayDataLoadingError() {
+            const container = d3.select('#visualizations');
+            container.html(`
+        <div style="text-align: center; padding: 2rem; color: #d32f2f;">
+            <h3>Data Loading Error</h3>
+            <p>We encountered an issue loading the bicycle accident data. Please try again later.</p>
+            <button onclick="window.location.reload()" class="btn" style="background-color: #d32f2f;">Retry</button>
+        </div>
+    `);
+        }
+        async function loadData() {
+            try {
+                // Show progress in loader text
+                updateLoaderText("Loading bicycle accident data...");
+
+                // Load all years data
+                const accidentData = await dataProcessor.loadAllYearsData();
+
+                // If we got no accident data, throw an error
+                if (!accidentData || accidentData.length === 0) {
+                    throw new Error("No accident data was loaded");
+                }
+
+                // Update loader text to show processing
+                updateLoaderText("Processing accident trends...");
+
+                // Calculate total accidents
+                totalAccidents = accidentData.length;
+                console.log(`Loaded ${totalAccidents} total bicycle accidents`);
+
+                // Process data for yearly trend chart
+                const yearlyAccidents = dataProcessor.getTotalAccidentsByYear();
+                yearlyData = Object.entries(yearlyAccidents)
+                    .map(([year, count]) => ({ year: parseInt(year), count }))
+                    .filter(item => item.year !== 'unknown' && !isNaN(item.year));
+
+                // Sort by year
+                yearlyData.sort((a, b) => a.year - b.year);
+
+                if (yearlyData.length === 0) {
+                    console.error("No yearly data available after processing");
+                }
+
+                // Update loader text for severity data
+                updateLoaderText("Analyzing injury severity...");
+
+                // Process data for severity chart
+                const gravityData = dataProcessor.getAccidentsByYearAndGravity();
+                const allGravityData = {};
+
+                // Aggregate gravity data across all years
+                Object.values(gravityData).forEach(yearData => {
+                    Object.entries(yearData).forEach(([gravity, count]) => {
+                        if (gravity !== 'unknown') {
+                            allGravityData[gravity] = (allGravityData[gravity] || 0) + count;
+                        }
+                    });
+                });
+
+                console.log("Gravity data:", allGravityData);
+
+                // Convert to array for the chart
+                const totalGravityCount = Object.values(allGravityData).reduce((sum, count) => sum + count, 0);
+
+                // Map gravity codes to readable names
+                const severityLevels = {
+                    "1": "Indemne",
+                    "2": "Fatal",
+                    "3": "Hospitalized",
+                    "4": "Light Injury"
+                };
+
+                severityData = [];
+
+                // Ensure we have data for each severity level
+                Object.entries(severityLevels).forEach(([gravityCode, severityName]) => {
+                    const count = allGravityData[gravityCode] || 0;
+                    const percentage = totalGravityCount > 0 ? Math.round((count / totalGravityCount) * 100) : 0;
+
+                    if (count > 0) {  // Only include non-zero counts
+                        severityData.push({
+                            severity: severityName,
+                            count: percentage,
+                            rawCount: count
+                        });
+                    }
+                });
+
+                console.log("Processed severity data:", severityData);
+
+                // Update loader text for time data processing
+                updateLoaderText("Processing time patterns...");
+
+                // Process data for time of day chart
+                // Group accidents by hour (from the hrmn field)
+                const hourlyData = {};
+                accidentData.forEach(accident => {
+                    if (accident.hrmn) {
+                        // Extract hour from hrmn field (format is HHMM)
+                        const hourStr = accident.hrmn.toString().padStart(4, '0').substring(0, 2);
+                        const hour = parseInt(hourStr, 10);
+
+                        if (!isNaN(hour)) {
+                            // Group into 2-hour blocks
+                            const hourBlock = Math.floor(hour / 2) * 2;
+                            const hourRange = `${hourBlock}-${hourBlock + 2}`;
+                            hourlyData[hourRange] = (hourlyData[hourRange] || 0) + 1;
+                        }
+                    }
+                });
+
+                // Convert to array for the chart
+                timeData = Object.entries(hourlyData).map(([hour, count]) => {
+                    return { hour, count };
+                });
+
+                // Sort by hour range
+                timeData.sort((a, b) => {
+                    const hourA = parseInt(a.hour.split('-')[0]);
+                    const hourB = parseInt(b.hour.split('-')[0]);
+                    return hourA - hourB;
+                });
+
+                // Update loader text for processing location data
+                updateLoaderText("Analyzing geographic patterns...");
 
 
-    </div>
+                updateLoaderText("Preparing visualizations...");
 
+                return true;
+            } catch (error) {
+                console.error("Error loading data:", error);
+                updateLoaderText("Error loading data. Please try again.");
+                return false;
+            }
+        }
+
+        // Counter animation function
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const duration = 2000; // 2 seconds
+            const frameDuration = 1000 / 60; // 60fps
+            const totalFrames = Math.round(duration / frameDuration);
+            let frame = 0;
+
+            const counter = setInterval(() => {
+                frame++;
+                const progress = frame / totalFrames;
+                const currentCount = Math.round(easeOutQuad(progress) * targetValue);
+
+                if (frame === totalFrames) {
+                    clearInterval(counter);
+                    element.textContent = targetValue.toLocaleString();
+                } else {
+                    element.textContent = currentCount.toLocaleString();
+                }
+            }, frameDuration);
+        }
+
+        // Easing function for counter
+        function easeOutQuad(x) {
+            return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+        }
+
+        // Scroll animation handler
+        function initScrollAnimations() {
+            const animatedElements = document.querySelectorAll('.scroll-animation');
+
+            const checkScroll = function () {
+                animatedElements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+
+                    if (elementTop < windowHeight * 0.85) {
+                        element.classList.add('active');
+                    }
+                });
+            };
+
+            // Initial check
+            checkScroll();
+
+            // Check on scroll
+            window.addEventListener('scroll', checkScroll);
+        }
+
+        // Create the yearly trend chart
+        function createYearlyTrendChart() {
+            const container = d3.select('#yearlyTrendChart');
+            const width = parseInt(container.style('width'));
+            const height = parseInt(container.style('height'));
+            const margin = { top: 30, right: 30, bottom: 50, left: 60 };
+
+            const svg = container.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            const chart = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const xScale = d3.scaleLinear()
+                .domain(d3.extent(yearlyData, d => d.year))
+                .range([0, width - margin.left - margin.right]);
+
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(yearlyData, d => d.count) * 1.1])
+                .range([height - margin.top - margin.bottom, 0]);
+
+            // Add X axis
+            chart.append('g')
+                .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
+                .call(d3.axisBottom(xScale).tickFormat(d3.format('d')).ticks(10))
+                .selectAll('text')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end');
+
+            // Add Y axis
+            chart.append('g')
+                .call(d3.axisLeft(yScale));
+
+            // Add line
+            const line = d3.line()
+                .x(d => xScale(d.year))
+                .y(d => yScale(d.count))
+                .curve(d3.curveMonotoneX);
+
+            chart.append('path')
+                .datum(yearlyData)
+                .attr('fill', 'none')
+                .attr('stroke', '#0052cc')
+                .attr('stroke-width', 3)
+                .attr('d', line);
+
+            // Add dots
+            chart.selectAll('circle')
+                .data(yearlyData)
+                .enter()
+                .append('circle')
+                .attr('cx', d => xScale(d.year))
+                .attr('cy', d => yScale(d.count))
+                .attr('r', 5)
+                .attr('fill', '#0052cc');
+
+            // Add X axis label
+            chart.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('x', (width - margin.left - margin.right) / 2)
+                .attr('y', height - margin.top)
+                .text('Year');
+
+            // Add Y axis label
+            chart.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', -margin.left + 20)
+                .attr('x', -(height - margin.top - margin.bottom) / 2)
+                .text('Number of Accidents');
+        }
+
+        // Fixed createGravityChart function
+        function createGravityChart() {
+            const container = d3.select('#gravityChart');
+            const width = parseInt(container.style('width'));
+            const height = parseInt(container.style('height'));
+            const margin = { top: 50, right: 30, bottom: 50, left: 60 };
+
+            // Clear any existing chart
+            container.html("");
+
+            const svg = container.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            const chart = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // Check if we have the raw gravity data
+            const gravityData = dataProcessor.getAccidentsByYearAndGravity();
+            const allGravityData = {};
+
+            // Manually process gravity data to ensure it's not empty
+            Object.values(gravityData).forEach(yearData => {
+                Object.entries(yearData).forEach(([gravity, count]) => {
+                    if (gravity !== 'unknown') {
+                        allGravityData[gravity] = (allGravityData[gravity] || 0) + count;
+                    }
+                });
+            });
+
+            // Create severity data directly
+            const totalGravityCount = Object.values(allGravityData).reduce((sum, count) => sum + count, 0);
+            const localSeverityData = [];
+
+            // Map gravity codes to readable names
+            const severityLevels = {
+                "1": "Indemne",
+                "2": "Fatal",
+                "3": "Hospitalized",
+                "4": "Light Injury"
+            };
+
+            // Create severity data
+            Object.entries(severityLevels).forEach(([gravityCode, severityName]) => {
+                const count = allGravityData[gravityCode] || 0;
+                if (totalGravityCount > 0) {
+                    const percentage = Math.round((count / totalGravityCount) * 100);
+                    if (count > 0) {
+                        localSeverityData.push({
+                            severity: severityName,
+                            count: percentage,
+                            rawCount: count
+                        });
+                    }
+                }
+            });
+
+            console.log("Local severity data:", localSeverityData);
+
+            // Validate data - ensure we have data to display
+            if (localSeverityData.length === 0) {
+                chart.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('x', (width - margin.left - margin.right) / 2)
+                    .attr('y', (height - margin.top - margin.bottom) / 2)
+                    .style('font-size', '16px')
+                    .text('No severity data available');
+                return;
+            }
+
+            // Sort severity data by count
+            localSeverityData.sort((a, b) => b.count - a.count);
+
+            // Create scales
+            const xScale = d3.scaleBand()
+                .domain(localSeverityData.map(d => d.severity))
+                .range([0, width - margin.left - margin.right])
+                .padding(0.3);
+
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(localSeverityData, d => d.count) * 1.1])
+                .range([height - margin.top - margin.bottom, 0]);
+
+            // Add X axis
+            chart.append('g')
+                .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
+                .call(d3.axisBottom(xScale))
+                .selectAll('text')
+                .style('text-anchor', 'middle');
+
+            // Add Y axis
+            chart.append('g')
+                .call(d3.axisLeft(yScale).tickFormat(d => d + '%'));
+
+            // Define colors based on severity
+            const colorScale = d3.scaleOrdinal()
+                .domain(localSeverityData.map(d => d.severity))
+                .range(["#74c476", "#ffeda0", "#feb24c", "#f03b20"]);
+
+            // Add bars
+            chart.selectAll('.bar')
+                .data(localSeverityData)
+                .enter()
+                .append('rect')
+                .attr('class', 'bar')
+                .attr('x', d => xScale(d.severity))
+                .attr('y', d => yScale(d.count))
+                .attr('width', xScale.bandwidth())
+                .attr('height', d => Math.max(0, height - margin.top - margin.bottom - yScale(d.count))) // Ensure height is never negative
+                .attr('fill', d => colorScale(d.severity))
+                .attr('rx', 3)
+                .attr('ry', 3);
+
+            // Add value labels on top of bars
+            chart.selectAll('.label')
+                .data(localSeverityData)
+                .enter()
+                .append('text')
+                .attr('class', 'label')
+                .attr('text-anchor', 'middle')
+                .attr('x', d => xScale(d.severity) + xScale.bandwidth() / 2)
+                .attr('y', d => yScale(d.count) - 5)
+                .text(d => d.count + '%')
+                .style('font-size', '12px')
+                .style('font-weight', 'bold');
+
+            // Add X axis label
+            chart.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('x', (width - margin.left - margin.right) / 2)
+                .attr('y', height - margin.top)
+                .text('Injury Severity');
+
+            // Add Y axis label
+            chart.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', -margin.left + 20)
+                .attr('x', -(height - margin.top - margin.bottom) / 2)
+                .text('Percentage of Accidents');
+
+            // Add title
+            svg.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('x', width / 2)
+                .attr('y', 25)
+                .style('font-size', '16px')
+                .style('font-weight', 'bold')
+                .text('Accident Severity Distribution');
+        }
+
+        // Create time of day chart
+        function createTimeOfDayChart() {
+            const container = d3.select('#timeOfDayChart');
+            const width = parseInt(container.style('width'));
+            const height = parseInt(container.style('height'));
+            const margin = { top: 30, right: 30, bottom: 50, left: 60 };
+
+            const svg = container.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            const chart = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const xScale = d3.scaleBand()
+                .domain(timeData.map(d => d.hour))
+                .range([0, width - margin.left - margin.right])
+                .padding(0.2);
+
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(timeData, d => d.count) * 1.1])
+                .range([height - margin.top - margin.bottom, 0]);
+
+            // Add X axis
+            chart.append('g')
+                .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
+                .call(d3.axisBottom(xScale))
+                .selectAll('text')
+                .style('text-anchor', 'end')
+                .attr('dx', '-.8em')
+                .attr('dy', '.15em')
+                .attr('transform', 'rotate(-45)');
+
+            // Add Y axis
+            chart.append('g')
+                .call(d3.axisLeft(yScale));
+
+            // Add bars
+            chart.selectAll('rect')
+                .data(timeData)
+                .enter()
+                .append('rect')
+                .attr('x', d => xScale(d.hour))
+                .attr('y', d => yScale(d.count))
+                .attr('width', xScale.bandwidth())
+                .attr('height', d => height - margin.top - margin.bottom - yScale(d.count))
+                .attr('fill', '#0052cc')
+                .attr('rx', 2)
+                .attr('ry', 2);
+
+            // Add X axis label
+            chart.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('x', (width - margin.left - margin.right) / 2)
+                .attr('y', height - margin.top)
+                .text('Time of Day (hours)');
+
+            // Add Y axis label
+            chart.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', -margin.left + 20)
+                .attr('x', -(height - margin.top - margin.bottom) / 2)
+                .text('Number of Accidents');
+        }
+
+        // Replace the entire createSeasonalPatternsChart function with this simpler version
+        function createSeasonalPatternsChart() {
+            console.log("Creating seasonal patterns chart...");
+            const container = d3.select('#seasonalPatternsChart');
+            container.html(""); // Clear the container
+
+            // Force container to be visible with fixed dimensions
+            container.style('display', 'block')
+                .style('height', '300px')
+                .style('width', '100%');
+
+            // Log container dimensions
+            const width = parseInt(container.style('width'));
+            const height = parseInt(container.style('height'));
+            console.log(`Seasonal chart container: width=${width}, height=${height}`);
+
+            // Get the monthly data directly
+            const monthlyData = dataProcessor.getAccidentsByMonth();
+            console.log("Monthly data:", monthlyData);
+
+            // Create a very simple SVG
+            const svg = container.append('svg')
+                .attr('width', '100%')
+                .attr('height', '100%');
+
+            // Create simple bars - avoid complex d3 scales for now
+            const barWidth = 30;
+            const spacing = 10;
+            const maxCount = Math.max(...monthlyData.map(d => d.count));
+            const heightScale = 200 / maxCount; // Scale to fit in 200px height
+
+            // Add title
+            svg.append('text')
+                .attr('x', 400)
+                .attr('y', 30)
+                .attr('text-anchor', 'middle')
+                .style('font-weight', 'bold')
+                .text('Seasonal Accident Patterns');
+
+            // Add bars manually
+            monthlyData.forEach((month, i) => {
+                const barHeight = month.count * heightScale;
+                const x = 100 + i * (barWidth + spacing);
+                const y = 250 - barHeight;
+
+                // Add the bar
+                svg.append('rect')
+                    .attr('x', x)
+                    .attr('y', y)
+                    .attr('width', barWidth)
+                    .attr('height', barHeight)
+                    .attr('fill', '#0052cc');
+
+                // Add month label
+                svg.append('text')
+                    .attr('x', x + barWidth / 2)
+                    .attr('y', 265)
+                    .attr('text-anchor', 'middle')
+                    .style('font-size', '10px')
+                    .text(month.month.substr(0, 3));
+
+                // Add count label
+                svg.append('text')
+                    .attr('x', x + barWidth / 2)
+                    .attr('y', y - 5)
+                    .attr('text-anchor', 'middle')
+                    .style('font-size', '10px')
+                    .text(month.count);
+            });
+        }
+
+        function createUrbanRuralChart() {
+            console.log("Creating urban/rural chart...");
+            const container = d3.select('#urbanRuralChart');
+            container.html(""); // Clear the container
+
+            // Force container to be visible with fixed dimensions
+            container.style('display', 'block')
+                .style('height', '300px')
+                .style('width', '100%');
+
+            // Log container dimensions
+            const width = parseInt(container.style('width'));
+            const height = parseInt(container.style('height'));
+            console.log(`Urban/Rural chart container: width=${width}, height=${height}`);
+
+            // Get the urban/rural data
+            const locationData = dataProcessor.getUrbanVsRuralAccidents();
+            const total = locationData.reduce((sum, item) => sum + item.count, 0);
+
+            // Calculate percentages
+            locationData.forEach(item => {
+                item.percentage = Math.round((item.count / total) * 100);
+            });
+
+            console.log("Location data with percentages:", locationData);
+
+            // Create a very simple SVG
+            const svg = container.append('svg')
+                .attr('width', '100%')
+                .attr('height', '100%');
+
+            // Add title
+            svg.append('text')
+                .attr('x', 400)
+                .attr('y', 30)
+                .attr('text-anchor', 'middle')
+                .style('font-weight', 'bold')
+                .text('Urban vs Rural Distribution');
+
+            // Create a simple pie chart manually
+            const centerX = 400;
+            const centerY = 150;
+            const radius = 100;
+
+            // Create pie slices
+            const urbanPercentage = locationData[0].percentage / 100;
+            const ruralPercentage = locationData[1].percentage / 100;
+
+            // Urban slice (blue)
+            svg.append('path')
+                .attr('d', describeArc(centerX, centerY, radius, 0, urbanPercentage * 360))
+                .attr('fill', '#1f78b4');
+
+            // Rural slice (green)
+            svg.append('path')
+                .attr('d', describeArc(centerX, centerY, radius, urbanPercentage * 360, 360))
+                .attr('fill', '#33a02c');
+
+            // Add center circle (donut hole)
+            svg.append('circle')
+                .attr('cx', centerX)
+                .attr('cy', centerY)
+                .attr('r', radius * 0.6)
+                .attr('fill', 'white');
+
+            // Add percentage labels
+            svg.append('text')
+                .attr('x', centerX)
+                .attr('y', centerY - 10)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '18px')
+                .style('font-weight', 'bold')
+                .text(`${locationData[0].percentage}%`);
+
+            svg.append('text')
+                .attr('x', centerX)
+                .attr('y', centerY + 20)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '14px')
+                .text('Urban');
+
+            // Add a legend
+            svg.append('rect')
+                .attr('x', 600)
+                .attr('y', 120)
+                .attr('width', 20)
+                .attr('height', 20)
+                .attr('fill', '#1f78b4');
+
+            svg.append('text')
+                .attr('x', 630)
+                .attr('y', 135)
+                .text(`Urban: ${locationData[0].percentage}%`);
+
+            svg.append('rect')
+                .attr('x', 600)
+                .attr('y', 150)
+                .attr('width', 20)
+                .attr('height', 20)
+                .attr('fill', '#33a02c');
+
+            svg.append('text')
+                .attr('x', 630)
+                .attr('y', 165)
+                .text(`Rural: ${locationData[1].percentage}%`);
+
+            // Add total count
+            svg.append('text')
+                .attr('x', centerX)
+                .attr('y', centerY + 80)
+                .attr('text-anchor', 'middle')
+                .text(`Total: ${total.toLocaleString()} accidents`);
+        }
+
+        // Helper function to create pie/donut chart segments
+        function describeArc(x, y, radius, startAngle, endAngle) {
+            const start = polarToCartesian(x, y, radius, endAngle);
+            const end = polarToCartesian(x, y, radius, startAngle);
+            const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+
+            return [
+                "M", start.x, start.y,
+                "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+                "L", x, y,
+                "Z"
+            ].join(" ");
+        }
+
+        function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+            const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+            return {
+                x: centerX + (radius * Math.cos(angleInRadians)),
+                y: centerY + (radius * Math.sin(angleInRadians))
+            };
+        }
+    </script>
 </body>
 
 </html>

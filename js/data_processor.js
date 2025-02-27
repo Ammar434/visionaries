@@ -19,7 +19,7 @@ export class DataProcessor {
                 await this.loadYearData(year);
             }
 
-            return this.processAllYearsBicycleAccidents();
+            return await this.processAllYearsBicycleAccidents();
         } catch (error) {
             this.logger.error('Error loading multi-year data:', error);
             throw error;
@@ -86,11 +86,60 @@ export class DataProcessor {
         return id.toString().trim();
     }
 
-    processAllYearsBicycleAccidents() {
+    // async processAllYearsBicycleAccidents() {
+    //     this.aggregatedBicycleAccidents = [];
+
+    //     Object.entries(this.yearlyData).forEach(([year, yearData]) => {
+    //         if (!yearData) return; // Skip years with failed data loading
+    //         const bicycleVehicles = yearData.vehicules.filter(v =>
+    //             v.catv && ['1', '01'].includes(v.catv.toString().trim())
+    //         );
+
+    //         const bicycleAccidentIds = new Set(
+    //             bicycleVehicles.map(v => this.normalizeId(v.Num_Acc))
+    //         );
+
+    //         const yearAccidents = yearData.caracteristiques
+    //             .filter(acc => bicycleAccidentIds.has(this.normalizeId(acc.Num_Acc)))
+    //             .map(acc => {
+    //                 const normalizedId = this.normalizeId(acc.Num_Acc);
+    //                 const lieuxInfo = yearData.lieux.find(l =>
+    //                     this.normalizeId(l.Num_Acc) === normalizedId
+    //                 );
+    //                 const usagersInfo = yearData.usagers.filter(u =>
+    //                     this.normalizeId(u.Num_Acc) === normalizedId
+    //                 );
+
+    //                 const lat = this.parseFrenchnumber(acc.lat);
+    //                 const long = this.parseFrenchnumber(acc.long);
+
+    //                 return {
+    //                     ...acc,
+    //                     year: parseInt(year),
+    //                     lat,
+    //                     long,
+    //                     users: usagersInfo,
+    //                     location_details: lieuxInfo
+    //                 };
+    //             });
+    //         this.logger.log(yearAccidents)
+
+    //         this.aggregatedBicycleAccidents.push(...yearAccidents);
+    //     });
+
+    //     return this.aggregatedBicycleAccidents;
+    // }
+
+    async processAllYearsBicycleAccidents() {
         this.aggregatedBicycleAccidents = [];
 
-        Object.entries(this.yearlyData).forEach(([year, yearData]) => {
-            if (!yearData) return; // Skip years with failed data loading
+        // Process each year's data in chunks
+        for (const [year, yearData] of Object.entries(this.yearlyData)) {
+            if (!yearData) continue; // Skip years with failed data loading
+
+            // Use setTimeout and Promise to allow other tasks to run
+            await new Promise(resolve => setTimeout(resolve, 0));
+
             const bicycleVehicles = yearData.vehicules.filter(v =>
                 v.catv && ['1', '01'].includes(v.catv.toString().trim())
             );
@@ -122,10 +171,10 @@ export class DataProcessor {
                         location_details: lieuxInfo
                     };
                 });
-            this.logger.log(yearAccidents)
 
+            this.logger.log(`Processed ${yearAccidents.length} accidents for year ${year}`);
             this.aggregatedBicycleAccidents.push(...yearAccidents);
-        });
+        }
 
         return this.aggregatedBicycleAccidents;
     }
@@ -147,13 +196,32 @@ export class DataProcessor {
     }
 
     getAccidentsByYearAndGravity() {
-        return this.aggregatedBicycleAccidents.reduce((acc, accident) => {
+        // Initialize result object
+        const result = {};
+
+        // Process each accident
+        this.aggregatedBicycleAccidents.forEach(accident => {
             const year = accident.year || 'unknown';
-            const gravity = accident.grav || 'unknown';
-            acc[year] = acc[year] || {};
-            acc[year][gravity] = (acc[year][gravity] || 0) + 1;
-            return acc;
-        }, {});
+            result[year] = result[year] || {};
+
+            // If users array exists and has entries, use their gravity values
+            if (accident.users && accident.users.length > 0) {
+                // Process each user's gravity for this accident
+                accident.users.forEach(user => {
+                    if (user.grav) {
+                        const gravity = user.grav;
+                        result[year][gravity] = (result[year][gravity] || 0) + 1;
+                    }
+                });
+            }
+            // If no users or missing user gravity, try to use the accident's gravity
+            else if (accident.grav) {
+                const gravity = accident.grav;
+                result[year][gravity] = (result[year][gravity] || 0) + 1;
+            }
+        });
+
+        return result;
     }
 
     getGeographicClustersByYear(precision = 2) {
@@ -236,5 +304,50 @@ export class DataProcessor {
             acc[year] = gravitySum[year] / gravityCount[year];
             return acc;
         }, {});
+    }
+
+    getAccidentsByMonth() {
+        const monthlyData = Array(12).fill(0);
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        this.aggregatedBicycleAccidents.forEach(accident => {
+            const month = parseInt(accident.mois);
+            if (!isNaN(month) && month >= 1 && month <= 12) {
+                monthlyData[month - 1]++;
+            }
+        });
+
+        return monthlyData.map((count, index) => {
+            return {
+                month: monthNames[index],
+                count: count,
+                monthIndex: index + 1
+            };
+        });
+    }
+
+    // Add urban vs rural analysis
+    getUrbanVsRuralAccidents() {
+        const result = {
+            urban: 0,
+            rural: 0
+        };
+
+        this.aggregatedBicycleAccidents.forEach(accident => {
+            // agg field: 1 = rural, 2 = urban
+            if (accident.agg === '1') {
+                result.rural++;
+            } else if (accident.agg === '2') {
+                result.urban++;
+            }
+        });
+
+        return [
+            { location: "Urban", count: result.urban },
+            { location: "Rural", count: result.rural }
+        ];
     }
 }

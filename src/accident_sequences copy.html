@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse des Séquences d'Accidents de Vélo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        /* Base styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header section */
+        .dashboard-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .dashboard-title {
+            font-size: 1.8rem;
+            color: #0052cc;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-subtitle {
+            font-size: 1.1rem;
+            color: #555;
+            font-weight: normal;
+        }
+
+        /* Main visualization container */
+        .visualization-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 20px;
+            margin-top: 20px;
+            min-height: 600px;
+        }
+
+        /* Controls panel */
+        .controls-panel {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .controls-title {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .level-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .level-selector label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .level-selector input {
+            margin-right: 6px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .primary-button {
+            background-color: #0052cc;
+            color: white;
+            border: none;
+        }
+
+        .primary-button:hover {
+            background-color: #0043a4;
+        }
+
+        .secondary-button {
+            background-color: white;
+            color: #0052cc;
+            border: 1px solid #0052cc;
+        }
+
+        .secondary-button:hover {
+            background-color: #f0f5ff;
+        }
+
+        /* Sunburst and info section */
+        .sunburst-container {
+            flex: 2;
+            position: relative;
+            min-height: 600px;
+        }
+
+        .center-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .center-percentage {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            line-height: 1;
+        }
+
+        .center-sequence {
+            margin-top: 10px;
+            font-size: 1rem;
+            max-width: 200px;
+            color: #555;
+        }
+
+        .center-count {
+            margin-top: 5px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        /* Responsive legend */
+        .legend-container {
+            flex: 1;
+            max-width: 280px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .legend-title {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .legend-section {
+            margin-bottom: 20px;
+        }
+
+        .legend-section-title {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .legend-item:hover {
+            opacity: 0.8;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+
+        .legend-label {
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        /* Tooltip */
+        .sunburst-tooltip {
+            position: absolute;
+            visibility: hidden;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            font-size: 0.9rem;
+            z-index: 1000;
+            max-width: 280px;
+        }
+
+        .tooltip-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .tooltip-value {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .tooltip-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        /* Loading indicator */
+        .loading-indicator {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #0052cc;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 1100px) {
+            .visualization-container {
+                flex-direction: column;
+            }
+
+            .legend-container {
+                max-width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            .legend-section {
+                flex: 1;
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 15px;
+            }
+
+            .dashboard-title {
+                font-size: 1.5rem;
+            }
+
+            .controls-panel {
+                padding: 15px;
+            }
+
+            .level-selector {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Analyse des Séquences d'Accidents de Vélo</h1>
+            <h2 class="dashboard-subtitle">Visualisation hiérarchique des circonstances d'accidents</h2>
+        </div>
+
+        <div class="controls-panel">
+            <h3 class="controls-title">Options de visualisation</h3>
+            <div class="level-selector" id="level-selector">
+                <!-- Level checkboxes will be generated by JS -->
+            </div>
+            <div class="button-group">
+                <button class="action-button primary-button" id="reset-button">Réinitialiser</button>
+                <button class="action-button secondary-button" id="export-button">Exporter SVG</button>
+            </div>
+        </div>
+
+        <div class="visualization-container">
+            <div class="sunburst-container" id="sunburst-container">
+                <!-- SVG will be inserted here -->
+                <div class="center-info">
+                    <div class="center-percentage" id="center-percentage"></div>
+                    <div class="center-sequence" id="center-sequence"></div>
+                    <div class="center-count" id="center-count"></div>
+                </div>
+            </div>
+
+            <div class="legend-container" id="legend-container">
+                <!-- Legend will be generated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { VIZ_CONFIG } from '../js/accident_sequences.js';
+        import { AccidentSequences } from '../js/accident_sequences.js';
+
+        // ===== PASTE THE ImprovedSunburstVisualization CLASS HERE =====
+        /**
+         * ImprovedSunburstVisualization class
+         * Creates and manages an interactive sunburst diagram for accident data visualization
+         */
+        class ImprovedSunburstVisualization {
+            /**
+             * Create a new sunburst visualization
+             * @param {Object} options - Optional configuration overrides
+             */
+            constructor(options = {}) {
+                // Define default configuration in case the import fails
+                const DEFAULT_CONFIG = {
+                    dimensions: {
+                        width: 750,
+                        height: 750,
+                        radiusRatio: 20,
+                        minRadiusScale: 0.2,
+                        maxRadiusScale: 0.85,
+                        padding: 0.01,
+                        legendWidth: 200,
+                        legendItemHeight: 25
+                    },
+                    colors: {
+                        defaultColor: "#ccc",
+                        backgroundColor: "#f8f9fa",
+                        textColor: "#333333",
+                        highlightColor: "#ff7f0e",
+                        opacity: {
+                            default: 0.8,
+                            highlight: 1.0,
+                            fade: 0.3
+                        }
+                    },
+                    colorScales: {
+                        timeOfDay: {
+                            title: "Moment de la journée",
+                            domain: ['plein-jour', 'crepuscule', 'nuit-sans-eclairage', 'nuit-eclairage-eteint', 'nuit-eclairage-allume'],
+                            range: ['#ffd700', '#ffa500', '#2c3e50', '#34495e', '#7f8c8d'],
+                            labels: {
+                                'plein-jour': 'Plein jour',
+                                'crepuscule': 'Crépuscule',
+                                'nuit-sans-eclairage': 'Nuit (sans éclairage)',
+                                'nuit-eclairage-eteint': 'Nuit (éclairage éteint)',
+                                'nuit-eclairage-allume': 'Nuit (éclairage allumé)'
+                            }
+                        },
+                        weather: {
+                            title: "Conditions météo",
+                            domain: ['normal', 'pluie-legere', 'pluie-forte', 'neige-grele', 'brouillard', 'vent-tempete'],
+                            range: ['#66c2a5', '#8da0cb', '#6baed6', '#a6cee3', '#b2df8a', '#e31a1c'],
+                            labels: {
+                                'normal': 'Normal',
+                                'pluie-legere': 'Pluie légère',
+                                'pluie-forte': 'Pluie forte',
+                                'neige-grele': 'Neige/Grêle',
+                                'brouillard': 'Brouillard',
+                                'vent-tempete': 'Vent/Tempête'
+                            }
+                        },
+                        location: {
+                            title: "Type de localisation",
+                            domain: ['en-agglomeration', 'hors-agglomeration'],
+                            range: ['#e78ac3', '#a6d854'],
+                            labels: {
+                                'en-agglomeration': 'Zone urbaine',
+                                'hors-agglomeration': 'Zone rurale'
+                            }
+                        },
+                        severity: {
+                            title: "Gravité des blessures",
+                            domain: ['indemne', 'blesse-leger', 'hospitalise', 'tue'],
+                            range: ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3'],
+                            labels: {
+                                'indemne': 'Indemne',
+                                'blesse-leger': 'Blessure légère',
+                                'hospitalise': 'Hospitalisé',
+                                'tue': 'Fatal'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 750,
+                        delay: 50
+                    },
+                    levels: [
+                        { id: 'timeOfDay', name: 'Moment de la journée' },
+                        { id: 'weather', name: 'Conditions météo' },
+                        { id: 'location', name: 'Localisation' },
+                        { id: 'severity', name: 'Gravité' }
+                    ]
+                };
+
+                try {
+                    // Safely access the imported config or use default if unavailable
+                    let importedConfig;
+                    try {
+                        importedConfig = VIZ_CONFIG;
+                        console.log("Imported VIZ_CONFIG successfully");
+                    } catch (e) {
+                        console.warn("VIZ_CONFIG not available, using default config");
+                        importedConfig = DEFAULT_CONFIG;
+                    }
+
+                    // Ensure levels exists in the config
+                    if (!importedConfig.levels) {
+                        console.warn("No levels defined in VIZ_CONFIG, using default levels");
+                        importedConfig.levels = DEFAULT_CONFIG.levels;
+                    }
+
+                    // Set default configuration first with proper validation
+                    this.config = { ...DEFAULT_CONFIG, ...importedConfig, ...options };
+
+                    // Safely create selected levels
+                    this.selectedLevels = this.config.levels && Array.isArray(this.config.levels) ?
+                        [...this.config.levels.slice(0, 2)] : // Use first two levels by default
+                        [];
+
+                } catch (error) {
+                    console.error("Error initializing configuration:", error);
+                    this.config = DEFAULT_CONFIG;
+                    this.selectedLevels = DEFAULT_CONFIG.levels.slice(0, 2);
+                }
+
+                // Initialize other properties
+                this.selectedNode = null;
+                this.data = null;
+                this.isUpdating = false; // Flag to prevent recursive updates
+                this.isInitialized = false;
+
+                // Wait for DOM to be fully loaded before accessing elements
+                document.addEventListener('DOMContentLoaded', () => {
+                    this.initDomElements();
+                    this.init();
+                });
+
+                // If document is already loaded, initialize immediately
+                if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                    this.initDomElements();
+                    this.init();
+                }
+            }
+
+            /**
+             * Initialize DOM element references
+             */
+            initDomElements() {
+                this.sunburstContainer = document.getElementById('sunburst-container');
+                this.legendContainer = document.getElementById('legend-container');
+                this.levelSelector = document.getElementById('level-selector');
+                this.centerPercentage = document.getElementById('center-percentage');
+                this.centerSequence = document.getElementById('center-sequence');
+                this.centerCount = document.getElementById('center-count');
+
+                // Set up tooltip
+                this.tooltip = d3.select("body")
+                    .append("div")
+                    .attr("class", "sunburst-tooltip");
+            }
+
+            /**
+             * Initialize the visualization
+             */
+            init() {
+                // Only initialize if DOM elements are available
+                if (!this.sunburstContainer || !this.legendContainer) {
+                    console.warn("DOM elements not ready yet, delaying initialization");
+                    return;
+                }
+
+                try {
+                    console.log("Starting visualization initialization");
+                    this.setupDimensions();
+                    this.createControls();
+                    this.setupSVG();
+                    this.setupColorScales();
+                    this.setupLayout();
+                    this.createLegend();
+
+                    // Set up event listeners
+                    const resetButton = document.getElementById('reset-button');
+                    const exportButton = document.getElementById('export-button');
+
+                    if (resetButton) {
+                        resetButton.addEventListener('click', () => this.resetZoom());
+                    }
+
+                    if (exportButton) {
+                        exportButton.addEventListener('click', () => this.downloadSVG());
+                    }
+
+                    // Set up responsive behavior
+                    window.addEventListener('resize', this.handleResize.bind(this));
+
+                    // Force a small SVG to be visible
+                    this.createDemoCircle();
+
+                    // Mark as initialized
+                    this.isInitialized = true;
+                    console.log("Visualization initialized successfully");
+                } catch (error) {
+                    console.error("Error during initialization:", error);
+                    this.isInitialized = false;
+                }
+            }
+
+            /**
+             * Set up visualization dimensions
+             */
+            setupDimensions() {
+                // Set default container dimensions
+                let containerWidth = 700;
+                let containerHeight = 700;
+
+                try {
+                    // Attempt to get the actual container dimensions
+                    if (this.sunburstContainer) {
+                        const containerRect = this.sunburstContainer.getBoundingClientRect();
+
+                        if (containerRect && containerRect.width > 0) {
+                            containerWidth = containerRect.width;
+                            containerHeight = containerRect.height || containerWidth;
+
+                            console.log("Container dimensions:", containerWidth, containerHeight);
+                        } else {
+                            console.warn("Container has invalid dimensions, using defaults");
+                        }
+                    } else {
+                        console.warn("Container not available, using default dimensions");
+                    }
+                } catch (error) {
+                    console.error("Error getting container dimensions:", error);
+                }
+
+                // Ensure minimum dimensions
+                this.width = Math.max(containerWidth, 300);
+                this.height = Math.max(containerHeight, 300);
+                this.radius = Math.min(this.width, this.height) / 2;
+
+                console.log("Set visualization dimensions:", this.width, this.height, this.radius);
+
+                // Force visibility on container
+                if (this.sunburstContainer) {
+                    this.sunburstContainer.style.minHeight = `${this.height}px`;
+                    this.sunburstContainer.style.minWidth = `${this.width}px`;
+                }
+            }
+
+            /**
+             * Create control panel elements
+             */
+            createControls() {
+                // Create level selection checkboxes
+                this.config.levels.forEach((level) => {
+                    const label = document.createElement('label');
+
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.value = level.id;
+                    input.checked = this.selectedLevels.some(l => l.id === level.id);
+                    input.addEventListener('change', (event) => {
+                        this.toggleLevel(level.id, event.target.checked);
+                    });
+
+                    const span = document.createElement('span');
+                    span.textContent = level.name;
+
+                    label.appendChild(input);
+                    label.appendChild(span);
+                    this.levelSelector.appendChild(label);
+                });
+            }
+
+            /**
+             * Set up the SVG container for the visualization
+             */
+            setupSVG() {
+                // Remove any existing SVG
+                if (this.sunburstContainer) {
+                    const existingSvg = this.sunburstContainer.querySelector('svg');
+                    if (existingSvg) {
+                        existingSvg.remove();
+                    }
+                }
+
+                // Force the container to have a specific size
+                this.sunburstContainer.style.width = `${this.width}px`;
+                this.sunburstContainer.style.height = `${this.height}px`;
+                this.sunburstContainer.style.position = "relative";
+
+                console.log("Setting container style with explicit size:", this.width, this.height);
+
+                // Create SVG with explicit dimensions
+                this.svg = d3.select(this.sunburstContainer).append("svg")
+                    .attr("width", this.width)
+                    .attr("height", this.height)
+                    .attr("viewBox", `0 0 ${this.width} ${this.height}`)
+                    .style("font-family", "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif")
+                    .style("display", "block") // Ensure it's displayed as block
+                    .style("margin", "0 auto") // Center it
+                    .style("z-index", "10"); // Ensure it's above other elements
+
+                // Debug info
+                console.log("SVG created with dimensions:", this.width, this.height);
+
+                // Add a visible background rectangle for debugging
+                this.svg.append("rect")
+                    .attr("width", this.width)
+                    .attr("height", this.height)
+                    .attr("fill", "#f9f9f9")
+                    .attr("stroke", "#ddd")
+                    .attr("stroke-width", 2);
+
+                // Create main group for sunburst with explicit translation
+                this.chart = this.svg.append("g")
+                    .attr("transform", `translate(${this.width / 2},${this.height / 2})`)
+                    .attr("class", "sunburst-chart");
+
+                // Add a visible circle to mark the center
+                this.chart.append("circle")
+                    .attr("r", 10)
+                    .attr("fill", "#0052cc")
+                    .attr("stroke", "white")
+                    .attr("stroke-width", 2);
+
+                console.log("Chart group created and translated to center:", this.width / 2, this.height / 2);
+            }
+            /**
+             * Add a demo circle to ensure SVG is visible
+             */
+            createDemoCircle() {
+                if (this.chart) {
+                    // Add a small debug circle to verify SVG is working
+                    this.chart.append("circle")
+                        .attr("r", 5)
+                        .attr("fill", "none")
+                        .attr("stroke", "#ddd")
+                        .attr("stroke-width", 1);
+
+                    console.log("Added demo circle to SVG");
+                }
+            }
+
+            /**
+             * Set up color scales for the visualization
+             */
+            setupColorScales() {
+                this.colorScales = {};
+                Object.entries(this.config.colorScales).forEach(([level, scale]) => {
+                    this.colorScales[level] = d3.scaleOrdinal()
+                        .domain(scale.domain)
+                        .range(scale.range);
+                });
+            }
+
+            /**
+             * Set up the D3 layout for partitioning data
+             */
+            setupLayout() {
+                // Ensure the radius is substantial
+                this.radius = Math.min(this.width, this.height) / 2.2; // Slightly smaller than half to ensure padding
+                console.log("Using radius:", this.radius);
+
+                // Create arc generator with more visible inner radius
+                this.arc = d3.arc()
+                    .startAngle(d => d.x0)
+                    .endAngle(d => d.x1)
+                    .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.01)) // Slightly larger padding
+                    .padRadius(this.radius / 2)
+                    .innerRadius(d => Math.max(d.y0 * this.radius, 10)) // Ensure a minimum inner radius
+                    .outerRadius(d => Math.max(d.y0 * this.radius, d.y1 * this.radius - 1));
+
+                // Create partition layout
+                this.partition = d3.partition()
+                    .size([2 * Math.PI, this.radius]);
+
+                console.log("Partition layout created with size:", [2 * Math.PI, this.radius]);
+            }
+
+            /**
+             * Create interactive legend for the visualization
+             */
+            createLegend() {
+                // Clear existing legend
+                this.legendContainer.innerHTML = "";
+
+                // Add legend title
+                const legendTitle = document.createElement('h3');
+                legendTitle.className = 'legend-title';
+                legendTitle.textContent = 'Légende';
+                this.legendContainer.appendChild(legendTitle);
+
+                // Create sections for each level in the visualization
+                this.selectedLevels.forEach((level) => {
+                    const scaleInfo = this.config.colorScales[level.id];
+                    if (!scaleInfo) return;
+
+                    // Create section container
+                    const section = document.createElement('div');
+                    section.className = `legend-section legend-${level.id}`;
+
+                    // Add section title
+                    const sectionTitle = document.createElement('h4');
+                    sectionTitle.className = 'legend-section-title';
+                    sectionTitle.textContent = scaleInfo.title;
+                    section.appendChild(sectionTitle);
+
+                    // Add items
+                    scaleInfo.domain.forEach(category => {
+                        const item = document.createElement('div');
+                        item.className = 'legend-item';
+                        item.addEventListener('mouseover', () => this.highlightCategory(level.id, category));
+                        item.addEventListener('mouseout', () => this.resetHighlight());
+
+                        const colorSwatch = document.createElement('div');
+                        colorSwatch.className = 'legend-color';
+                        colorSwatch.style.backgroundColor = this.colorScales[level.id](category);
+
+                        const label = document.createElement('div');
+                        label.className = 'legend-label';
+                        label.textContent = scaleInfo.labels[category] || category;
+
+                        item.appendChild(colorSwatch);
+                        item.appendChild(label);
+                        section.appendChild(item);
+                    });
+
+                    this.legendContainer.appendChild(section);
+                });
+            }
+
+            /**
+             * Apply level filtering to the data
+             * @param {Object} data - The original data
+             * @returns {Object} - Filtered data
+             */
+            applyLevelFilter(data) {
+                if (!data) return { name: "root", children: [] };
+
+                // Get selected level IDs
+                const levelIds = this.selectedLevels.map(l => l.id);
+
+                // If using all levels or no levels selected, return original data
+                if (levelIds.length === this.config.levels.length) {
+                    return data;
+                }
+
+                // Clone the data to avoid modifying the original
+                const filteredData = { name: data.name, children: [] };
+
+                // Maximum depth to go (based on selected levels)
+                const maxDepth = levelIds.length;
+
+                // Helper to calculate total value of a node and its children
+                // FIXED: Define getNodeValue within the method scope
+                const getNodeValue = (node) => {
+                    if (!node.children) return node.value || 0;
+
+                    let sum = 0;
+                    for (const child of node.children) {
+                        sum += getNodeValue(child);
+                    }
+                    return sum;
+                };
+
+                // Iterative approach to avoid stack overflow
+                const processNode = (srcNode, destNode, currentDepth) => {
+                    if (currentDepth >= maxDepth) {
+                        // We've reached max depth, calculate the sum
+                        destNode.value = getNodeValue(srcNode);
+                        return;
+                    }
+
+                    // Process children if they exist
+                    if (srcNode.children && srcNode.children.length > 0) {
+                        destNode.children = [];
+
+                        for (const srcChild of srcNode.children) {
+                            const destChild = { name: srcChild.name };
+                            destNode.children.push(destChild);
+                            processNode(srcChild, destChild, currentDepth + 1);
+                        }
+                    } else {
+                        // No children, so just copy the value
+                        destNode.value = srcNode.value || 0;
+                    }
+                };
+
+                // Start processing from root
+                processNode(data, filteredData, 0);
+
+                // Debug log
+                console.log("Filtered data:", filteredData);
+
+                return filteredData;
+            }
+
+            /**
+             * Update the visualization with new data
+             * @param {Object} data - The hierarchical data for the visualization
+             */
+            ensureLeafValues(node, depth = 0) {
+                if (!node) return;
+
+                // Process leaf nodes
+                if (!node.children || node.children.length === 0) {
+                    // Ensure leaf nodes have a value
+                    if (!node.value || node.value <= 0) {
+                        node.value = 1; // Default value
+                    }
+                } else {
+                    // Process children
+                    node.children.forEach(child => this.ensureLeafValues(child, depth + 1));
+                }
+            }
+
+            /**
+             * Debug data structure values
+             */
+            debugDataValues(node, depth = 0, path = "") {
+                if (!node) return;
+
+                const newPath = path + (path ? ' > ' : '') + node.name;
+
+                // Log leaf nodes with values
+                if (!node.children || node.children.length === 0) {
+                    console.log(`Leaf node at ${newPath}: value = ${node.value || 'none'}`);
+                }
+
+                // Only process first few levels deeply to avoid console spam
+                if (depth < 3) {
+                    if (node.children && node.children.length > 0) {
+                        // Log a sample of children at each level
+                        const sampleSize = Math.min(node.children.length, 3);
+                        console.log(`Node ${node.name} has ${node.children.length} children, showing ${sampleSize}`);
+
+                        for (let i = 0; i < sampleSize; i++) {
+                            this.debugDataValues(node.children[i], depth + 1, newPath);
+                        }
+                    }
+                }
+            }
+
+            /**
+             * Enhanced setupSVG with forced dimensions and test pattern
+             */
+            setupSVG() {
+                // Remove any existing SVG
+                if (this.sunburstContainer) {
+                    const existingSvg = this.sunburstContainer.querySelector('svg');
+                    if (existingSvg) {
+                        existingSvg.remove();
+                    }
+                }
+
+                // Force the container to have a specific size
+                this.sunburstContainer.style.width = `${this.width}px`;
+                this.sunburstContainer.style.height = `${this.height}px`;
+                this.sunburstContainer.style.position = "relative";
+                this.sunburstContainer.style.border = "1px solid #ccc";
+
+                console.log("Setting container style with explicit size:", this.width, this.height);
+
+                // Create SVG with explicit dimensions
+                this.svg = d3.select(this.sunburstContainer).append("svg")
+                    .attr("width", this.width)
+                    .attr("height", this.height)
+                    .attr("viewBox", `0 0 ${this.width} ${this.height}`)
+                    .style("font-family", "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif")
+                    .style("display", "block")
+                    .style("margin", "0 auto");
+
+                // Add a visible background rectangle
+                this.svg.append("rect")
+                    .attr("width", this.width)
+                    .attr("height", this.height)
+                    .attr("fill", "#f9f9f9")
+                    .attr("stroke", "#ddd")
+                    .attr("stroke-width", 1);
+
+                // Add test pattern to verify SVG is working
+                // Draw a simple sunburst-like test pattern
+                const testGroup = this.svg.append("g")
+                    .attr("class", "test-pattern")
+                    .attr("transform", `translate(${this.width / 2},${this.height / 2})`);
+
+                // Inner circle
+                testGroup.append("circle")
+                    .attr("r", 40)
+                    .attr("fill", "#e6f2ff")
+                    .attr("stroke", "#0052cc")
+                    .attr("stroke-width", 1);
+
+                // Some test segments
+                const testArc = d3.arc()
+                    .innerRadius(40)
+                    .outerRadius(100)
+                    .padAngle(0.03);
+
+                // Create some test segments
+                const testData = [
+                    { startAngle: 0, endAngle: Math.PI * 0.5, fill: "#66c2a5" },
+                    { startAngle: Math.PI * 0.5, endAngle: Math.PI, fill: "#fc8d62" },
+                    { startAngle: Math.PI, endAngle: Math.PI * 1.5, fill: "#8da0cb" },
+                    { startAngle: Math.PI * 1.5, endAngle: Math.PI * 2, fill: "#e78ac3" }
+                ];
+
+                testData.forEach(d => {
+                    testGroup.append("path")
+                        .attr("d", testArc(d))
+                        .attr("fill", d.fill)
+                        .attr("stroke", "white")
+                        .attr("stroke-width", 1)
+                        .attr("class", "test-segment");
+                });
+
+                // Add text to verify text rendering
+                testGroup.append("text")
+                    .attr("text-anchor", "middle")
+                    .attr("dy", "0.35em")
+                    .text("Test Pattern")
+                    .style("font-size", "14px")
+                    .style("fill", "#333");
+
+                // Create main group for actual sunburst
+                this.chart = this.svg.append("g")
+                    .attr("transform", `translate(${this.width / 2},${this.height / 2})`)
+                    .attr("class", "sunburst-chart");
+
+                // Add a visible circle to mark the center
+                this.chart.append("circle")
+                    .attr("r", 5)
+                    .attr("fill", "#0052cc")
+                    .attr("stroke", "white")
+                    .attr("stroke-width", 1);
+            }
+            update(data) {
+                // Prevent recursive updates
+                if (this.isUpdating) return;
+                this.isUpdating = true;
+
+                console.log("Updating visualization with data:", data);
+
+                try {
+                    this.data = data;
+
+                    // Apply level filtering if needed
+                    const filteredData = this.applyLevelFilter(data);
+
+                    // Debug data structure before hierarchy creation
+                    this.debugDataValues(filteredData);
+
+                    // CRITICAL FIX: Ensure all leaf nodes have values
+                    this.ensureLeafValues(filteredData);
+
+                    // Create hierarchy with explicit value accessor
+                    const root = d3.hierarchy(filteredData)
+                        .sum(d => {
+                            // Ensure numeric values
+                            const val = typeof d.value === 'number' ? d.value : 0;
+                            // Debug value computation
+                            if (val > 0) {
+                                console.log(`Node ${d.name} has value ${val}`);
+                            }
+                            return val > 0 ? val : 1; // Use 1 as minimum to ensure visibility
+                        })
+                        .sort((a, b) => b.value - a.value);
+
+                    console.log("Hierarchy created:", root);
+                    console.log("Root value:", root.value);
+
+                    // Store the original positions for animations
+                    this.currentRoot = root;
+
+                    // Calculate partition layout - FORCE LARGER SIZE
+                    this.radius = Math.min(this.width, this.height) / 2.2;
+                    this.partition = d3.partition().size([2 * Math.PI, this.radius]);
+
+                    const nodes = this.partition(root).descendants();
+                    console.log("Nodes created:", nodes.length);
+
+                    // Debug first few nodes
+                    console.log("First 5 nodes:", nodes.slice(0, 5).map(n => ({
+                        name: n.data.name,
+                        depth: n.depth,
+                        value: n.value,
+                        x0: n.x0,
+                        x1: n.x1,
+                        y0: n.y0,
+                        y1: n.y1
+                    })));
+
+                    // Debug SVG dimensions
+                    console.log("SVG dimensions:", this.width, this.height);
+
+                    // Create transition
+                    const t = d3.transition()
+                        .duration(this.config.animation.duration);
+
+                    // Update the paths - FORCE VISIBILITY
+                    const paths = this.chart.selectAll("path.segment")
+                        .data(nodes.filter(d => d.depth > 0), d => d.data.name + d.depth);
+
+                    console.log("Path data:", paths.size());
+
+                    // Handle exiting nodes
+                    paths.exit()
+                        .transition(t)
+                        .style("opacity", 0)
+                        .remove();
+
+                    // CRITICAL FIX: Force arc dimensions for visibility
+                    this.arc = d3.arc()
+                        .startAngle(d => d.x0)
+                        .endAngle(d => d.x1)
+                        .padAngle(0.01)
+                        .padRadius(this.radius / 2)
+                        .innerRadius(d => Math.max(d.y0 * this.radius, 20)) // Larger minimum inner radius
+                        .outerRadius(d => Math.max(d.y0 * this.radius, d.y1 * this.radius));
+
+                    // Handle new nodes
+                    const enterPaths = paths.enter()
+                        .append("path")
+                        .attr("class", "segment")
+                        .attr("d", d => {
+                            // Debug path generation for first few nodes
+                            const pathData = this.arc(d);
+                            if (d.depth <= 2) {
+                                console.log(`Path for ${d.data.name}: (x0=${d.x0.toFixed(4)}, x1=${d.x1.toFixed(4)}, y0=${d.y0.toFixed(4)}, y1=${d.y1.toFixed(4)})`);
+                            }
+                            return pathData;
+                        })
+                        .style("fill", d => this.getColor(d))
+                        .style("stroke", "white")
+                        .style("stroke-width", 1.5) // Increased for visibility
+                        .style("opacity", 0);
+
+                    console.log("Enter paths:", enterPaths.size());
+
+                    // Store current state for transitions
+                    enterPaths.each(function (d) {
+                        this._current = d;
+                    });
+
+                    // Add interactivity
+                    enterPaths
+                        .on("mouseover", (event, d) => this.handleMouseOver(event, d))
+                        .on("mousemove", (event) => this.handleMouseMove(event))
+                        .on("mouseout", () => this.handleMouseOut())
+                        .on("click", (event, d) => this.handleClick(event, d));
+
+                    // Make all paths visible immediately for debugging
+                    this.chart.selectAll("path.segment")
+                        .transition(t)
+                        .style("fill", d => this.getColor(d))
+                        .style("opacity", 1); // Force full opacity
+
+                    // Update center text
+                    this.updateCenterText(root);
+
+                    console.log("Update completed successfully");
+                } catch (error) {
+                    console.error("Error during update:", error);
+                } finally {
+                    // Always reset the update flag
+                    this.isUpdating = false;
+                }
+            }
+            /**
+            * Get the appropriate color for a data point
+            * @param {Object} d - The data point
+            * @returns {string} - The color as a hex code
+            */
+            getColor(d) {
+                // Skip the root node
+                if (d.depth === 0) return 'none';
+
+                // Get the appropriate level for this depth
+                const levelIds = this.selectedLevels.map(l => l.id);
+                const scaleKey = levelIds[d.depth - 1];
+
+                // Debug color assignment
+                if (d.depth <= 2) {
+                    console.log("Color lookup for", d.data.name, "using scale:", scaleKey);
+                }
+
+                if (!scaleKey || !this.colorScales[scaleKey]) {
+                    console.log("Using default color for", d.data.name, "at depth", d.depth);
+                    return this.config.colors.defaultColor;
+                }
+
+                const color = this.colorScales[scaleKey](d.data.name) || this.config.colors.defaultColor;
+
+                // Debug color assignment
+                if (d.depth <= 2) {
+                    console.log("Assigned color for", d.data.name, ":", color);
+                }
+
+                return color;
+            }
+            /**
+             * Format a number with commas
+             * @param {number} num - The number to format
+             * @returns {string} - The formatted number
+             */
+            formatNumber(num) {
+                if (num === undefined || num === null) return "0";
+                return new Intl.NumberFormat().format(num);
+            }
+
+            /**
+             * Handle mouse over event for segments
+             * @param {Event} event - The mouse event
+             * @param {Object} d - The data point
+             */
+            handleMouseOver(event, d) {
+                // Calculate percentage
+                const root = d.ancestors().find(node => node.depth === 0);
+                const percentage = (100 * d.value / root.value).toFixed(1);
+
+                // Get the sequence
+                const sequence = d.ancestors().reverse().slice(1);
+
+                // Update center display
+                this.updateCenterText(null, d, percentage);
+
+                // Highlight the sequence
+                this.highlightSequence(sequence);
+
+                // Show tooltip
+                this.showTooltip(event, d, percentage);
+            }
+
+            /**
+             * Handle mouse move event for tooltip positioning
+             * @param {Event} event - The mouse event
+             */
+            handleMouseMove(event) {
+                // Position tooltip near mouse
+                this.tooltip
+                    .style("left", (event.pageX + 15) + "px")
+                    .style("top", (event.pageY - 10) + "px");
+            }
+
+            /**
+             * Handle mouse out event
+             */
+            handleMouseOut() {
+                // Hide tooltip
+                this.tooltip.style("visibility", "hidden");
+
+                // Reset center text if no node is selected
+                if (!this.selectedNode) {
+                    this.updateCenterText(this.currentRoot);
+                }
+
+                // Reset highlight if no node is selected
+                if (!this.selectedNode) {
+                    this.resetHighlight();
+                }
+            }
+
+            /**
+             * Handle click event on segments
+             * @param {Event} event - The click event
+             * @param {Object} d - The data point
+             */
+            handleClick(event, d) {
+                // Toggle selection state
+                if (this.selectedNode === d) {
+                    this.selectedNode = null;
+                    this.resetZoom();
+                } else {
+                    this.selectedNode = d;
+                    this.zoomToNode(d);
+                }
+
+                // Prevent event bubbling
+                event.stopPropagation();
+            }
+
+            /**
+             * Zoom to a specific node
+             * @param {Object} d - The node to zoom to
+             */
+            zoomToNode(d) {
+                if (!d || this.isUpdating) return;
+
+                // Get the sequence for this node
+                const sequence = d.ancestors().reverse().slice(1);
+
+                // Highlight the sequence
+                this.highlightSequence(sequence);
+
+                // Update center text
+                const root = d.ancestors().find(node => node.depth === 0);
+                const percentage = (100 * d.value / root.value).toFixed(1);
+                this.updateCenterText(null, d, percentage);
+
+                // Create a fixed transition
+                const t = d3.transition().duration(750);
+
+                // Track which paths should stay visible
+                const keepVisible = new Set();
+                sequence.forEach(node => keepVisible.add(node));
+
+                // Get angle sizes for zooming
+                const targetX0 = d.x0;
+                const targetX1 = d.x1;
+                const targetY0 = d.y0;
+                const targetY1 = d.y1;
+
+                // Apply transform to visible paths
+                this.chart.selectAll("path.segment")
+                    .filter(node => keepVisible.has(node) || node === d)
+                    .transition(t)
+                    .attrTween("d", function (node) {
+                        // Calculate scaled position
+                        const xScale = d3.scaleLinear()
+                            .domain([targetX0, targetX1])
+                            .range([0, 2 * Math.PI]);
+
+                        const yScale = d3.scaleLinear()
+                            .domain([targetY0, 1])
+                            .range([0, 1]);
+
+                        // Store start and end points
+                        const startX0 = node.x0;
+                        const startX1 = node.x1;
+                        const startY0 = node.y0;
+                        const startY1 = node.y1;
+
+                        // Define what the final state should be
+                        const endX0 = xScale(node.x0);
+                        const endX1 = xScale(node.x1);
+                        const endY0 = yScale(node.y0);
+                        const endY1 = yScale(node.y1);
+
+                        // Create interpolator
+                        const interpolator = d3.interpolateObject(
+                            { x0: startX0, x1: startX1, y0: startY0, y1: startY1 },
+                            { x0: endX0, x1: endX1, y0: endY0, y1: endY1 }
+                        );
+
+                        // Return tween function
+                        return (t) => {
+                            const pos = interpolator(t);
+                            node.x0 = pos.x0;
+                            node.x1 = pos.x1;
+                            node.y0 = pos.y0;
+                            node.y1 = pos.y1;
+                            return this.arc(node);
+                        };
+                    }.bind(this));
+
+                // Fade out paths that should be hidden
+                this.chart.selectAll("path.segment")
+                    .filter(node => !keepVisible.has(node) && node !== d)
+                    .transition(t)
+                    .style("opacity", 0.1);
+            }
+
+            /**
+             * Reset zoom to show the entire visualization
+             */
+            resetZoom() {
+                // Prevent during updates
+                if (this.isUpdating) return;
+
+                // Clear selected node
+                this.selectedNode = null;
+
+                // Reset highlight
+                this.resetHighlight();
+
+                // Only proceed if we have data
+                if (!this.data) return;
+
+                // Reset the visualization with a smooth transition
+                this.update(this.data);
+            }
+
+            /**
+             * Show tooltip with detailed information
+             * @param {Event} event - The mouse event
+             * @param {Object} d - The data point
+             * @param {string} percentage - The percentage string
+             */
+            showTooltip(event, d, percentage) {
+                // Get sequence for display
+                const sequence = d.ancestors().reverse().slice(1);
+                const sequenceLabels = [];
+
+                // Build sequence labels safely to avoid recursion
+                for (let i = 0; i < sequence.length; i++) {
+                    const node = sequence[i];
+                    const levelId = this.selectedLevels[i]?.id;
+
+                    if (!levelId) {
+                        sequenceLabels.push(node.data.name);
+                        continue;
+                    }
+
+                    const scaleInfo = this.config.colorScales[levelId];
+                    const label = scaleInfo?.labels[node.data.name] || node.data.name;
+                    sequenceLabels.push(label);
+                }
+
+                // Create tooltip content
+                let content = `
+            <div class="tooltip-title">${sequenceLabels.join(' > ')}</div>
+            <div class="tooltip-value">
+                <div class="tooltip-label">Nombre:</div>
+                <div>${this.formatNumber(d.value)}</div>
+            </div>
+            <div class="tooltip-value">
+                <div class="tooltip-label">Pourcentage:</div>
+                <div>${percentage}%</div>
+            </div>
+        `;
+
+                // Show tooltip
+                this.tooltip
+                    .html(content)
+                    .style("left", (event.pageX + 15) + "px")
+                    .style("top", (event.pageY - 10) + "px")
+                    .style("visibility", "visible");
+            }
+
+            /**
+             * Update the center text display
+             * @param {Object} root - The root node (for total count)
+             * @param {Object} node - The currently selected/hovered node
+             * @param {string} percentage - The percentage to display
+             */
+            updateCenterText(root = null, node = null, percentage = null) {
+                // If root is provided, show total overview
+                if (root) {
+                    this.centerPercentage.textContent = "100%";
+                    this.centerSequence.textContent = "Tous les accidents";
+                    this.centerCount.textContent = `Total: ${this.formatNumber(root.value)}`;
+                    return;
+                }
+
+                // If no node is provided, clear the text
+                if (!node) {
+                    this.centerPercentage.textContent = "";
+                    this.centerSequence.textContent = "";
+                    this.centerCount.textContent = "";
+                    return;
+                }
+
+                // Get sequence for display
+                const sequence = node.ancestors().reverse().slice(1);
+                const sequenceLabels = [];
+
+                // Build sequence labels safely
+                for (let i = 0; i < sequence.length; i++) {
+                    const n = sequence[i];
+                    const levelId = i < this.selectedLevels.length ? this.selectedLevels[i].id : null;
+
+                    if (!levelId) {
+                        sequenceLabels.push(n.data.name);
+                        continue;
+                    }
+
+                    const scaleInfo = this.config.colorScales[levelId];
+                    const label = scaleInfo?.labels[n.data.name] || n.data.name;
+                    sequenceLabels.push(label);
+                }
+
+                // Update text elements
+                this.centerPercentage.textContent = `${percentage}%`;
+                this.centerSequence.textContent = sequenceLabels.join(' > ');
+                this.centerCount.textContent = `${this.formatNumber(node.value)} accidents`;
+            }
+
+            /**
+             * Highlight a sequence of nodes in the visualization
+             * @param {Array} sequence - Array of nodes to highlight
+             */
+            highlightSequence(sequence) {
+                if (!sequence || sequence.length === 0) return;
+
+                // Create a set for faster lookups
+                const highlightSet = new Set(sequence);
+
+                // Apply highlighting to all segments
+                this.chart.selectAll("path.segment")
+                    .transition()
+                    .duration(200)
+                    .style("opacity", node => {
+                        return highlightSet.has(node) ?
+                            this.config.colors.opacity.highlight :
+                            this.config.colors.opacity.fade;
+                    })
+                    .style("stroke-width", node => {
+                        return highlightSet.has(node) ? 1.5 : 0.5;
+                    });
+            }
+
+            /**
+             * Highlight segments belonging to a specific category
+             * @param {string} levelId - The level ID
+             * @param {string} category - The category value
+             */
+            highlightCategory(levelId, category) {
+                // Find the level index
+                const levelIndex = this.selectedLevels.findIndex(l => l.id === levelId);
+                if (levelIndex === -1) return;
+
+                // Highlight matching segments
+                this.chart.selectAll("path.segment")
+                    .transition()
+                    .duration(200)
+                    .style("opacity", node => {
+                        return (node.depth === levelIndex + 1 && node.data.name === category) ?
+                            this.config.colors.opacity.highlight :
+                            this.config.colors.opacity.fade;
+                    })
+                    .style("stroke-width", node => {
+                        return (node.depth === levelIndex + 1 && node.data.name === category) ? 1.5 : 0.5;
+                    });
+            }
+
+            /**
+             * Reset highlighting to default state
+             */
+            resetHighlight() {
+                // If we have a selected node, maintain its highlighting
+                if (this.selectedNode) {
+                    const sequence = this.selectedNode.ancestors().reverse().slice(1);
+                    this.highlightSequence(sequence);
+                    return;
+                }
+
+                // Otherwise reset to default opacity
+                this.chart.selectAll("path.segment")
+                    .transition()
+                    .duration(200)
+                    .style("opacity", this.config.colors.opacity.default)
+                    .style("stroke-width", 0.5);
+            }
+
+            /**
+             * Toggle a level in the hierarchy
+             * @param {string} levelId - The ID of the level to toggle
+             * @param {boolean} isActive - Whether the level should be active
+             */
+            toggleLevel(levelId, isActive) {
+                // Prevent during updates
+                if (this.isUpdating) return;
+
+                // Validate inputs
+                if (!levelId) return;
+
+                // Find the level info
+                const levelInfo = this.config.levels.find(l => l.id === levelId);
+                if (!levelInfo) return;
+
+                // Get a copy of current levels
+                const newLevels = [...this.selectedLevels];
+
+                // Update selected levels
+                if (isActive) {
+                    // Don't add if already present
+                    if (newLevels.some(l => l.id === levelId)) return;
+
+                    // Find the original position of this level
+                    const originalIndex = this.config.levels.findIndex(l => l.id === levelId);
+
+                    // Insert at the correct position
+                    let inserted = false;
+                    for (let i = 0; i < newLevels.length; i++) {
+                        const currentLevelIndex = this.config.levels.findIndex(l => l.id === newLevels[i].id);
+                        if (originalIndex < currentLevelIndex) {
+                            newLevels.splice(i, 0, levelInfo);
+                            inserted = true;
+                            break;
+                        }
+                    }
+
+                    // If not inserted, add to the end
+                    if (!inserted) {
+                        newLevels.push(levelInfo);
+                    }
+                } else {
+                    // Don't remove if it's not present
+                    if (!newLevels.some(l => l.id === levelId)) return;
+
+                    // Remove the level
+                    const index = newLevels.findIndex(l => l.id === levelId);
+                    if (index !== -1) {
+                        newLevels.splice(index, 1);
+                    }
+                }
+
+                // Only update if there's been a change
+                if (JSON.stringify(newLevels) !== JSON.stringify(this.selectedLevels)) {
+                    // Update selected levels
+                    this.selectedLevels = newLevels;
+
+                    // Reset selected node
+                    this.selectedNode = null;
+
+                    // Update visualization
+                    this.createLegend();
+                    this.update(this.data);
+                }
+            }
+
+            /**
+             * Handle window resize event
+             */
+            handleResize() {
+                // Prevent during updates
+                if (this.isUpdating) return;
+
+                // Update dimensions
+                this.setupDimensions();
+
+                // Update SVG viewBox
+                this.svg
+                    .attr("width", this.width)
+                    .attr("height", this.height)
+                    .attr("viewBox", `0 0 ${this.width} ${this.height}`);
+
+                // Update chart transform
+                this.chart
+                    .attr("transform", `translate(${this.width / 2},${this.height / 2})`);
+
+                // Update arc generator
+                this.setupLayout();
+
+                // Update visualization
+                if (this.data) {
+                    this.update(this.data);
+                }
+            }
+
+            /**
+             * Download the current SVG as an image
+             */
+            downloadSVG() {
+                try {
+                    // Create a clone of the SVG
+                    const svgClone = this.svg.node().cloneNode(true);
+
+                    // Set attributes needed for download
+                    d3.select(svgClone)
+                        .attr("xmlns", "http://www.w3.org/2000/svg")
+                        .attr("version", "1.1");
+
+                    // Convert to string
+                    const serializer = new XMLSerializer();
+                    const svgString = serializer.serializeToString(svgClone);
+
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+                    link.download = 'accident_visualization.svg';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch (error) {
+                    console.error("Error exporting SVG:", error);
+                    alert("Failed to export SVG. Please try again.");
+                }
+            }
+        }
+
+        /**
+         * Create a fallback data structure for debugging
+         */
+        function createFallbackData() {
+            return {
+                name: "root",
+                children: [
+                    {
+                        name: "plein-jour",
+                        children: [
+                            {
+                                name: "normal",
+                                children: [
+                                    {
+                                        name: "en-agglomeration",
+                                        value: 250
+                                    },
+                                    {
+                                        name: "hors-agglomeration",
+                                        value: 150
+                                    }
+                                ]
+                            },
+                            {
+                                name: "pluie-legere",
+                                children: [
+                                    {
+                                        name: "en-agglomeration",
+                                        value: 120
+                                    },
+                                    {
+                                        name: "hors-agglomeration",
+                                        value: 80
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "nuit-sans-eclairage",
+                        children: [
+                            {
+                                name: "normal",
+                                children: [
+                                    {
+                                        name: "en-agglomeration",
+                                        value: 100
+                                    },
+                                    {
+                                        name: "hors-agglomeration",
+                                        value: 180
+                                    }
+                                ]
+                            },
+                            {
+                                name: "pluie-legere",
+                                children: [
+                                    {
+                                        name: "en-agglomeration",
+                                        value: 40
+                                    },
+                                    {
+                                        name: "hors-agglomeration",
+                                        value: 70
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            };
+        }
+
+        /**
+         * Ensure that data always has a valid structure
+         */
+        function ensureValidData(data) {
+            // Check if data exists and has a valid structure
+            if (!data || typeof data !== 'object') {
+                console.warn("Creating fallback data structure, original data was invalid");
+                return createFallbackData();
+            }
+
+            // Check if data has children
+            if (!data.children || !Array.isArray(data.children) || data.children.length === 0) {
+                console.warn("Data has no children, using fallback structure but keeping original name");
+                const fallbackData = createFallbackData();
+                fallbackData.name = data.name || "root";
+                return fallbackData;
+            }
+
+            // Check if any leaf nodes have values
+            let hasValues = false;
+            const checkValues = (node) => {
+                if (!node) return;
+                if (node.value && typeof node.value === 'number' && node.value > 0) {
+                    hasValues = true;
+                }
+                if (node.children && Array.isArray(node.children)) {
+                    node.children.forEach(checkValues);
+                }
+            };
+
+            checkValues(data);
+
+            if (!hasValues) {
+                console.warn("Data has no valid values, adding values");
+                const addValues = (node) => {
+                    if (!node) return;
+
+                    if (!node.children || node.children.length === 0) {
+                        node.value = Math.floor(Math.random() * 100) + 1; // Add random value
+                    } else if (node.children && Array.isArray(node.children)) {
+                        node.children.forEach(addValues);
+                    }
+                };
+
+                addValues(data);
+            }
+
+            return data;
+        }
+
+        /**
+         * Initialize the visualization when document is ready
+         */
+        async function initVisualization() {
+            console.log("Starting visualization initialization process");
+
+            // Get container first
+            const container = document.getElementById('sunburst-container');
+            if (!container) {
+                console.error("Container element 'sunburst-container' not found");
+                return;
+            }
+
+            // Create loading indicator
+            const loading = document.createElement('div');
+            loading.className = 'loading-indicator';
+
+            const loadingText = document.createElement('div');
+            loadingText.className = 'loading-text';
+            loadingText.textContent = 'Chargement des données...';
+
+            const loadingSpinner = document.createElement('div');
+            loadingSpinner.className = 'loading-spinner';
+
+            loading.appendChild(loadingText);
+            loading.appendChild(loadingSpinner);
+            container.appendChild(loading);
+
+            try {
+                // Create visualization first to catch any initialization errors
+                console.log("Creating visualization instance");
+                const visualization = new ImprovedSunburstVisualization();
+
+                console.log("Checking if visualization is initialized");
+
+                // Only proceed with data loading if visualization initialized successfully
+                if (!visualization.isInitialized) {
+                    console.log("Waiting for initialization...");
+                    // Poll for initialization for a short time
+                    const initTimeout = 5000; // 5 seconds timeout
+                    const startTime = Date.now();
+
+                    await new Promise((resolve, reject) => {
+                        const checkInit = setInterval(() => {
+                            console.log("Checking initialization status:", visualization.isInitialized);
+                            if (visualization.isInitialized) {
+                                clearInterval(checkInit);
+                                resolve();
+                            } else if (Date.now() - startTime > initTimeout) {
+                                clearInterval(checkInit);
+                                reject(new Error("Initialization timed out"));
+                            }
+                        }, 100);
+                    });
+                }
+
+                console.log("Visualization initialized, loading data now");
+
+                // Once visualization is initialized, load data
+                let data;
+                try {
+                    // Try to load real data
+                    const sequences = new AccidentSequences();
+                    data = await sequences.createHierarchicalData();
+                    console.log("Data loaded successfully");
+
+                    // Debug data structure
+                    if (data) {
+                        console.log("Root node name:", data.name);
+                        console.log("Number of top-level children:", data.children ? data.children.length : 0);
+                    }
+
+                    // Ensure data has a valid structure
+                    data = ensureValidData(data);
+
+                } catch (dataError) {
+                    console.error("Error loading data:", dataError);
+                    console.log("Using fallback data instead");
+                    data = createFallbackData();
+                }
+
+                // Remove loading indicator
+                if (container.contains(loading)) {
+                    container.removeChild(loading);
+                }
+
+                // Add a small delay to ensure DOM is ready
+                setTimeout(() => {
+                    // Update visualization with data
+                    console.log("Updating visualization with data");
+                    try {
+                        visualization.update(data);
+                        console.log("Visualization update completed");
+                    } catch (updateError) {
+                        console.error("Error during visualization update:", updateError);
+
+                        // Try with fallback data as last resort
+                        try {
+                            console.log("Attempting update with fallback data");
+                            visualization.update(createFallbackData());
+                        } catch (finalError) {
+                            console.error("Final update attempt failed:", finalError);
+                        }
+                    }
+                }, 300);
+
+            } catch (error) {
+                console.error("Error in visualization process:", error);
+
+                // Clean up loading indicator
+                if (container.contains(loading)) {
+                    container.removeChild(loading);
+                }
+
+                // Show error message
+                container.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: #d32f2f;">
+                <h3>Erreur lors du chargement</h3>
+                <p>${error.message || 'Une erreur est survenue pendant l\'initialisation'}</p>
+                <p>Détails techniques: ${error.stack ? error.stack.split('\n')[0] : 'Erreur inconnue'}</p>
+                <button style="padding: 8px 16px; background-color: #0052cc; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 15px;" 
+                  onclick="window.location.reload()">
+                  Réessayer
+                </button>
+            </div>
+        `;
+            }
+        }
+
+        // /**
+        //  * Create a fallback data structure for debugging
+        //  */
+        // function createFallbackData() {
+        //     return {
+        //         name: "root",
+        //         children: [
+        //             {
+        //                 name: "plein-jour",
+        //                 children: [
+        //                     {
+        //                         name: "normal",
+        //                         children: [
+        //                             {
+        //                                 name: "en-agglomeration",
+        //                                 value: 250
+        //                             },
+        //                             {
+        //                                 name: "hors-agglomeration",
+        //                                 value: 150
+        //                             }
+        //                         ]
+        //                     },
+        //                     {
+        //                         name: "pluie-legere",
+        //                         children: [
+        //                             {
+        //                                 name: "en-agglomeration",
+        //                                 value: 120
+        //                             },
+        //                             {
+        //                                 name: "hors-agglomeration",
+        //                                 value: 80
+        //                             }
+        //                         ]
+        //                     }
+        //                 ]
+        //             },
+        //             {
+        //                 name: "nuit-sans-eclairage",
+        //                 children: [
+        //                     {
+        //                         name: "normal",
+        //                         children: [
+        //                             {
+        //                                 name: "en-agglomeration",
+        //                                 value: 100
+        //                             },
+        //                             {
+        //                                 name: "hors-agglomeration",
+        //                                 value: 180
+        //                             }
+        //                         ]
+        //                     },
+        //                     {
+        //                         name: "pluie-legere",
+        //                         children: [
+        //                             {
+        //                                 name: "en-agglomeration",
+        //                                 value: 40
+        //                             },
+        //                             {
+        //                                 name: "hors-agglomeration",
+        //                                 value: 70
+        //                             }
+        //                         ]
+        //                     }
+        //                 ]
+        //             }
+        //         ]
+        //     };
+        // }
+
+        // /**
+        //  * Ensure that data always has a valid structure
+        //  */
+        // function ensureValidData(data) {
+        //     // Check if data exists and has a valid structure
+        //     if (!data || typeof data !== 'object') {
+        //         console.warn("Creating fallback data structure, original data was invalid");
+        //         return createFallbackData();
+        //     }
+
+        //     // Check if data has children
+        //     if (!data.children || !Array.isArray(data.children) || data.children.length === 0) {
+        //         console.warn("Data has no children, using fallback structure but keeping original name");
+        //         const fallbackData = createFallbackData();
+        //         fallbackData.name = data.name || "root";
+        //         return fallbackData;
+        //     }
+
+        //     // Check if any leaf nodes have values
+        //     let hasValues = false;
+        //     const checkValues = (node) => {
+        //         if (!node) return;
+        //         if (node.value && typeof node.value === 'number' && node.value > 0) {
+        //             hasValues = true;
+        //         }
+        //         if (node.children && Array.isArray(node.children)) {
+        //             node.children.forEach(checkValues);
+        //         }
+        //     };
+
+        //     checkValues(data);
+
+        //     if (!hasValues) {
+        //         console.warn("Data has no valid values, adding values");
+        //         const addValues = (node) => {
+        //             if (!node) return;
+
+        //             if (!node.children || node.children.length === 0) {
+        //                 node.value = Math.floor(Math.random() * 100) + 1; // Add random value
+        //             } else if (node.children && Array.isArray(node.children)) {
+        //                 node.children.forEach(addValues);
+        //             }
+        //         };
+
+        //         addValues(data);
+        //     }
+
+        //     return data;
+        // }
+
+        // /**
+        //  * Initialize the visualization when document is ready
+        //  */
+        // async function initVisualization() {
+        //     console.log("Starting visualization initialization process");
+
+        //     // Get container first
+        //     const container = document.getElementById('sunburst-container');
+        //     if (!container) {
+        //         console.error("Container element 'sunburst-container' not found");
+        //         return;
+        //     }
+
+        //     // Create loading indicator
+        //     const loading = document.createElement('div');
+        //     loading.className = 'loading-indicator';
+
+        //     const loadingText = document.createElement('div');
+        //     loadingText.className = 'loading-text';
+        //     loadingText.textContent = 'Chargement des données...';
+
+        //     const loadingSpinner = document.createElement('div');
+        //     loadingSpinner.className = 'loading-spinner';
+
+        //     loading.appendChild(loadingText);
+        //     loading.appendChild(loadingSpinner);
+        //     container.appendChild(loading);
+
+        //     try {
+        //         // Create visualization first to catch any initialization errors
+        //         console.log("Creating visualization instance");
+        //         const visualization = new ImprovedSunburstVisualization();
+
+        //         console.log("Checking if visualization is initialized");
+
+        //         // Only proceed with data loading if visualization initialized successfully
+        //         if (!visualization.isInitialized) {
+        //             console.log("Waiting for initialization...");
+        //             // Poll for initialization for a short time
+        //             const initTimeout = 5000; // 5 seconds timeout
+        //             const startTime = Date.now();
+
+        //             await new Promise((resolve, reject) => {
+        //                 const checkInit = setInterval(() => {
+        //                     console.log("Checking initialization status:", visualization.isInitialized);
+        //                     if (visualization.isInitialized) {
+        //                         clearInterval(checkInit);
+        //                         resolve();
+        //                     } else if (Date.now() - startTime > initTimeout) {
+        //                         clearInterval(checkInit);
+        //                         reject(new Error("Initialization timed out"));
+        //                     }
+        //                 }, 100);
+        //             });
+        //         }
+
+        //         console.log("Visualization initialized, loading data now");
+
+        //         // Once visualization is initialized, load data
+        //         let data;
+        //         try {
+        //             // Try to load real data
+        //             const sequences = new AccidentSequences();
+        //             data = await sequences.createHierarchicalData();
+        //             console.log("Data loaded successfully");
+
+        //             // Debug data structure
+        //             if (data) {
+        //                 console.log("Root node name:", data.name);
+        //                 console.log("Number of top-level children:", data.children ? data.children.length : 0);
+        //             }
+
+        //             // Ensure data has a valid structure
+        //             data = ensureValidData(data);
+
+        //         } catch (dataError) {
+        //             console.error("Error loading data:", dataError);
+        //             console.log("Using fallback data instead");
+        //             data = createFallbackData();
+        //         }
+
+        //         // Remove loading indicator
+        //         if (container.contains(loading)) {
+        //             container.removeChild(loading);
+        //         }
+
+        //         // Add a small delay to ensure DOM is ready
+        //         setTimeout(() => {
+        //             // Update visualization with data
+        //             console.log("Updating visualization with data");
+        //             try {
+        //                 visualization.update(data);
+        //                 console.log("Visualization update completed");
+        //             } catch (updateError) {
+        //                 console.error("Error during visualization update:", updateError);
+
+        //                 // Try with fallback data as last resort
+        //                 try {
+        //                     console.log("Attempting update with fallback data");
+        //                     visualization.update(createFallbackData());
+        //                 } catch (finalError) {
+        //                     console.error("Final update attempt failed:", finalError);
+        //                 }
+        //             }
+        //         }, 300);
+
+        //     } catch (error) {
+        //         console.error("Error in visualization process:", error);
+
+        //         // Clean up loading indicator
+        //         if (container.contains(loading)) {
+        //             container.removeChild(loading);
+        //         }
+
+        //         // Show error message
+        //         container.innerHTML = `
+        //             <div style="padding: 20px; text-align: center; color: #d32f2f;">
+        //                 <h3>Erreur lors du chargement</h3>
+        //                 <p>${error.message || 'Une erreur est survenue pendant l\'initialisation'}</p>
+        //                 <p>Détails techniques: ${error.stack ? error.stack.split('\n')[0] : 'Erreur inconnue'}</p>
+        //                 <button style="padding: 8px 16px; background-color: #0052cc; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 15px;" 
+        //                   onclick="window.location.reload()">
+        //                   Réessayer
+        //                 </button>
+        //             </div>
+        //         `;
+        //     }
+        // }
+
+        // Use window.onload to ensure all resources are loaded
+        window.onload = initVisualization;
+    </script>
+</body>
+
+</html>

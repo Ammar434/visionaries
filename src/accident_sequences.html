@@ -3,26 +3,1290 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Séquences d'Accidents de Vélo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse des Séquences d'Accidents de Vélo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    <link rel="stylesheet" href="/styles/accident_sequences.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboard-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .dashboard-title {
+            font-size: 1.8rem;
+            color: #0052cc;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-subtitle {
+            font-size: 1.1rem;
+            color: #555;
+            font-weight: normal;
+        }
+
+        .visualization-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .controls-panel {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .controls-title {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .level-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .level-selector label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .level-selector input {
+            margin-right: 6px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .primary-button {
+            background-color: #0052cc;
+            color: white;
+            border: none;
+        }
+
+        .primary-button:hover {
+            background-color: #0043a4;
+        }
+
+        .secondary-button {
+            background-color: white;
+            color: #0052cc;
+            border: 1px solid #0052cc;
+        }
+
+        .secondary-button:hover {
+            background-color: #f0f5ff;
+        }
+
+        /* .sunburst-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            width: 700px;
+            height: 700px;
+            position: relative;
+        } */
+
+        .sunburst-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            width: 1200px;
+            /* Increased from 700px */
+            height: 1200px;
+            /* Increased from 700px */
+            position: relative;
+        }
+
+        /* For responsive design, adjust the media query */
+        @media (max-width: 1100px) {
+            .visualization-container {
+                flex-direction: column;
+            }
+
+            .sunburst-container {
+                width: 100%;
+                height: 800px;
+                /* Increased from 600px */
+            }
+
+            .legend-container {
+                width: 100%;
+            }
+        }
+
+        .center-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .center-percentage {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            line-height: 1;
+        }
+
+        .center-sequence {
+            margin-top: 10px;
+            font-size: 1rem;
+            max-width: 200px;
+            color: #555;
+        }
+
+        .center-count {
+            margin-top: 5px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .legend-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            min-width: 250px;
+        }
+
+        .legend-title {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .legend-section {
+            margin-bottom: 20px;
+        }
+
+        .legend-section-title {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+
+        .legend-label {
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        .sunburst-tooltip {
+            position: absolute;
+            visibility: hidden;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            font-size: 0.9rem;
+            z-index: 1000;
+            max-width: 280px;
+        }
+
+        .tooltip-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .tooltip-value {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .tooltip-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        @media (max-width: 1100px) {
+            .visualization-container {
+                flex-direction: column;
+            }
+
+            .sunburst-container {
+                width: 100%;
+                height: 600px;
+            }
+
+            .legend-container {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="chart-container">
-        <h4 class="ui blue header">Analyse des Séquences d'Accidents</h4>
-        <div class="text changeGraphSubTitle">
-            Visualisation hiérarchique des circonstances d'accidents
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Analyse des Séquences d'Accidents de Vélo</h1>
+            <h2 class="dashboard-subtitle">Visualisation hiérarchique des circonstances d'accidents</h2>
         </div>
-        <div id="sunburstChart">
-            <div id="chart"></div>
-            <div class="explanation">
-                <div id="percentage"></div>
-                <div class="sequence-text"></div>
+
+        <div class="controls-panel">
+            <h3 class="controls-title">Options de visualisation</h3>
+            <div class="level-selector" id="level-selector">
+                <!-- Level checkboxes will be generated by JS -->
+            </div>
+            <div class="button-group">
+                <button class="action-button primary-button" id="reset-button">Réinitialiser</button>
+                <button class="action-button secondary-button" id="export-button">Exporter SVG</button>
+            </div>
+        </div>
+
+        <div class="visualization-container">
+            <div class="sunburst-container" id="sunburst-container">
+                <div class="center-info">
+                    <div class="center-percentage" id="center-percentage"></div>
+                    <div class="center-sequence" id="center-sequence"></div>
+                    <div class="center-count" id="center-count"></div>
+                </div>
+            </div>
+
+            <div class="legend-container" id="legend-container">
+                <!-- Legend will be generated by JS -->
             </div>
         </div>
     </div>
-    <script type="module" src="/js/sunburst_visualization.js"></script>
+
+    <script type="module">
+        import { AccidentSequences, VIZ_CONFIG } from "../js/accident_sequences"
+
+        class SunburstViz {
+            constructor() {
+                // Initialize selected levels (first two by default)
+                this.selectedLevels = VIZ_CONFIG.levels.slice(0, 2);
+                this.selectedNode = null;
+
+                // Initialize DOM elements
+                this.setupDOM();
+
+                // Set up visualization
+                this.setupDimensions();
+                this.setupSVG();
+                this.setupColorScales();
+                this.setupControls();
+                this.setupEvents();
+
+                // Load real data
+                this.loadRealData();
+            }
+
+            setupDOM() {
+                this.container = document.getElementById('sunburst-container');
+                this.legendContainer = document.getElementById('legend-container');
+                this.levelSelector = document.getElementById('level-selector');
+                this.centerPercentage = document.getElementById('center-percentage');
+                this.centerSequence = document.getElementById('center-sequence');
+                this.centerCount = document.getElementById('center-count');
+
+                // Create tooltip
+                this.tooltip = document.createElement('div');
+                this.tooltip.className = 'sunburst-tooltip';
+                document.body.appendChild(this.tooltip);
+            }
+
+            setupDimensions() {
+                // Get container dimensions
+                const containerRect = this.container.getBoundingClientRect();
+                this.width = containerRect.width;
+                this.height = containerRect.height;
+                this.radius = Math.min(this.width, this.height) / 2 - 40;
+            }
+
+            setupSVG() {
+                // Create SVG element
+                this.svg = d3.select(this.container)
+                    .append('svg')
+                    .attr('width', this.width)
+                    .attr('height', this.height);
+
+                // Create chart group
+                this.chart = this.svg.append('g')
+                    .attr('transform', `translate(${this.width / 2}, ${this.height / 2})`);
+
+                // Set up arc generator
+                this.arc = d3.arc()
+                    .startAngle(d => d.x0)
+                    .endAngle(d => d.x1)
+                    .padAngle(0.01)
+                    .padRadius(this.radius / 2)
+                    .innerRadius(d => Math.max(d.y0 * this.radius, 10))
+                    .outerRadius(d => Math.max(d.y1 * this.radius - 1, 11));
+
+                // Set up partition layout
+                this.partition = d3.partition()
+                    .size([2 * Math.PI, 1]);
+            }
+
+            setupColorScales() {
+                // Create color scales for each level
+                this.colorScales = {};
+
+                Object.entries(VIZ_CONFIG.colorScales).forEach(([level, scale]) => {
+                    this.colorScales[level] = d3.scaleOrdinal()
+                        .domain(scale.domain)
+                        .range(scale.range);
+                });
+            }
+
+            setupControls() {
+                // Clear level selector
+                this.levelSelector.innerHTML = '';
+
+                // Add checkboxes for each level
+                VIZ_CONFIG.levels.forEach(level => {
+                    const label = document.createElement('label');
+
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.value = level.id;
+                    input.checked = this.selectedLevels.some(l => l.id === level.id);
+                    input.addEventListener('change', e => {
+                        this.toggleLevel(level.id, e.target.checked);
+                    });
+
+                    const span = document.createElement('span');
+                    span.textContent = level.name;
+
+                    label.appendChild(input);
+                    label.appendChild(span);
+                    this.levelSelector.appendChild(label);
+                });
+
+                // Set up legend
+                this.createLegend();
+            }
+
+            setupEvents() {
+                // Reset button
+                const resetButton = document.getElementById('reset-button');
+                if (resetButton) {
+                    resetButton.addEventListener('click', () => {
+                        this.resetZoom();
+                    });
+                }
+
+                // Export button
+                const exportButton = document.getElementById('export-button');
+                if (exportButton) {
+                    exportButton.addEventListener('click', () => {
+                        this.exportSVG();
+                    });
+                }
+
+                // Window resize
+                window.addEventListener('resize', () => {
+                    this.handleResize();
+                });
+            }
+
+            createLegend() {
+
+                // Clear legend
+                this.legendContainer.innerHTML = '';
+
+                // Add legend title
+                const title = document.createElement('h3');
+                title.className = 'legend-title';
+                title.textContent = 'Légende';
+                this.legendContainer.appendChild(title);
+
+                // Add sections for each selected level
+                this.selectedLevels.forEach(level => {
+                    const scaleInfo = VIZ_CONFIG.colorScales[level.id];
+                    if (!scaleInfo) return;
+
+                    // Section container
+                    const section = document.createElement('div');
+                    section.className = 'legend-section';
+
+                    // Section title
+                    const sectionTitle = document.createElement('h4');
+                    sectionTitle.className = 'legend-section-title';
+                    sectionTitle.textContent = scaleInfo.title;
+                    section.appendChild(sectionTitle);
+
+                    // Legend items
+                    scaleInfo.domain.forEach(value => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'legend-item';
+
+                        const colorDiv = document.createElement('div');
+                        colorDiv.className = 'legend-color';
+                        colorDiv.style.backgroundColor = this.colorScales[level.id](value);
+
+                        const labelDiv = document.createElement('div');
+                        labelDiv.className = 'legend-label';
+                        labelDiv.textContent = scaleInfo.labels[value] || value;
+
+                        itemDiv.appendChild(colorDiv);
+                        itemDiv.appendChild(labelDiv);
+                        section.appendChild(itemDiv);
+
+                        // Add hover effect
+                        itemDiv.addEventListener('mouseover', () => {
+                            this.highlightCategory(level.id, value);
+                        });
+
+                        itemDiv.addEventListener('mouseout', () => {
+                            this.resetHighlight();
+                        });
+
+                        itemDiv.addEventListener('click', () => {
+                            this.resetHighlight();
+                        });
+                    });
+
+                    this.legendContainer.appendChild(section);
+                });
+            }
+
+            async loadRealData() {
+                console.log("Loading real data from AccidentSequences...");
+
+                try {
+                    // Create a new instance of AccidentSequences
+                    const sequences = new AccidentSequences();
+
+                    // Get hierarchical data
+                    const data = await sequences.createHierarchicalData();
+
+                    // Update the visualization with the real data
+                    this.data = data;
+                    this.update(data);
+
+                    console.log("Data loaded successfully");
+                } catch (error) {
+                    console.error("Error loading data:", error);
+                    // No fallback - just show the error in console
+                }
+            }
+            // In SunburstViz class, fix the filterDataByLevels method:
+            filterDataByLevels(data) {
+                // Get level IDs from currently selected levels
+                const levelIds = this.selectedLevels.map(l => l.id);
+                const maxDepth = levelIds.length;
+
+                // Helper function to clone and filter data
+                const processNode = (node, depth = 0) => {
+                    // Create new node with the same name
+                    const newNode = { name: node.name };
+
+                    if (depth >= maxDepth) {
+                        // We've reached max depth, calculate the sum
+                        newNode.value = this.sumNodeValues(node);
+                        return newNode;
+                    }
+
+                    if (node.children && node.children.length > 0) {
+                        newNode.children = node.children.map(child =>
+                            processNode(child, depth + 1)
+                        );
+                    } else {
+                        newNode.value = node.value || 0;
+                    }
+
+                    return newNode;
+                };
+
+                return processNode(data);
+            }
+
+            // Fix the update method to properly handle data filtering
+            update(data) {
+                console.log("Updating visualization with data");
+
+                // Store original data
+                this.data = data;
+
+                // Filter data by selected levels - no custom ordering
+                const filteredData = this.filterDataByLevels(data);
+
+                // Create hierarchy
+                const root = d3.hierarchy(filteredData)
+                    .sum(d => {
+                        if (!d.children || d.children.length === 0) {
+                            return d.value || 0;
+                        }
+                        return 0;
+                    })
+                    .sort((a, b) => b.value - a.value);
+
+                // Store current root
+                this.currentRoot = root;
+
+                // Apply partition layout
+                const nodes = this.partition(root).descendants().filter(d => d.depth > 0);
+
+                console.log(`Created ${nodes.length} nodes for visualization`);
+
+                // Update paths
+                const paths = this.chart.selectAll('path')
+                    .data(nodes, d => `${d.data.name}-${d.depth}`);
+
+                // Remove old paths
+                paths.exit().remove();
+
+                // Add new paths with standard implementation
+                const enterPaths = paths.enter()
+                    .append('path')
+                    .attr('d', this.arc)
+                    .style('fill', d => this.getNodeColor(d))
+                    .style('stroke', 'white')
+                    .style('stroke-width', 0.5)
+                    .style('opacity', VIZ_CONFIG.colors.opacity.default);
+
+                // Add interactivity
+                enterPaths
+                    .on('mouseover', (event, d) => {
+                        this.handleMouseOver(event, d);
+                    })
+                    .on('mousemove', (event) => {
+                        this.handleMouseMove(event);
+                    })
+                    .on('mouseout', () => {
+                        this.handleMouseOut();
+                    })
+                    .on('click', (event, d) => {
+                        this.handleClick(event, d);
+                    });
+
+                // Update existing paths
+                paths
+                    .attr('d', this.arc)
+                    .style('fill', d => this.getNodeColor(d));
+
+                // Update center text
+                this.updateCenterText(root);
+            }
+            // update(data) {
+            //     console.log("Updating visualization with data");
+
+            //     // Store original data
+            //     this.data = data;
+
+            //     // Apply level filtering
+            //     const filteredData = this.filterDataByLevels(data);
+
+            //     // Create hierarchy
+            //     const root = d3.hierarchy(filteredData)
+            //         .sum(d => {
+            //             // Make sure leaf nodes have values
+            //             if (!d.children || d.children.length === 0) {
+            //                 return d.value || 1;
+            //             }
+            //             return 0;
+            //         })
+            //         .sort((a, b) => b.value - a.value);
+
+            //     // Store current root
+            //     this.currentRoot = root;
+
+            //     // Apply partition layout
+            //     const nodes = this.partition(root).descendants().filter(d => d.depth > 0);
+
+            //     console.log(`Created ${nodes.length} nodes for visualization`);
+
+            //     // Update paths
+            //     const paths = this.chart.selectAll('path')
+            //         .data(nodes, d => `${d.data.name}-${d.depth}`);
+
+            //     // Remove old paths
+            //     paths.exit().remove();
+
+            //     // Add new paths
+            //     const enterPaths = paths.enter()
+            //         .append('path')
+            //         .attr('d', this.arc)
+            //         .style('fill', d => this.getNodeColor(d))
+            //         .style('stroke', 'white')
+            //         .style('stroke-width', 0.5)
+            //         .style('opacity', VIZ_CONFIG.colors.opacity.default);
+
+            //     // Add interactivity
+            //     enterPaths
+            //         .on('mouseover', (event, d) => {
+            //             this.handleMouseOver(event, d);
+            //         })
+            //         .on('mousemove', (event) => {
+            //             this.handleMouseMove(event);
+            //         })
+            //         .on('mouseout', () => {
+            //             this.handleMouseOut();
+            //         })
+            //         .on('click', (event, d) => {
+            //             this.handleClick(event, d);
+            //         });
+
+            //     // Update existing paths
+            //     paths
+            //         .attr('d', this.arc)
+            //         .style('fill', d => this.getNodeColor(d));
+
+            //     // Update center text
+            //     this.updateCenterText(root);
+            // }
+
+            // filterDataByLevels(data) {
+            //     const levelIds = this.selectedLevels.map(l => l.id);
+            //     const maxDepth = levelIds.length;
+
+            //     // Helper function to clone and filter data
+            //     const processNode = (node, depth = 0) => {
+            //         const newNode = { name: node.name };
+
+            //         if (depth >= maxDepth) {
+            //             // We've reached max depth, calculate the sum
+            //             newNode.value = this.sumNodeValues(node);
+            //             return newNode;
+            //         }
+
+            //         if (node.children && node.children.length > 0) {
+            //             newNode.children = node.children.map(child =>
+            //                 processNode(child, depth + 1)
+            //             );
+            //         } else {
+            //             newNode.value = node.value || 0;
+            //         }
+
+            //         return newNode;
+            //     };
+
+            //     return processNode(data);
+            // }
+
+            sumNodeValues(node) {
+                if (node.value) return node.value;
+                if (!node.children || node.children.length === 0) return 0;
+
+                return node.children.reduce((sum, child) =>
+                    sum + this.sumNodeValues(child), 0
+                );
+            }
+
+            // getNodeColor(d) {
+            //     if (d.depth === 0) return 'none';
+
+            //     const levelIds = this.selectedLevels.map(l => l.id);
+            //     if (d.depth <= levelIds.length) {
+            //         const levelId = levelIds[d.depth - 1];
+            //         if (levelId && this.colorScales[levelId]) {
+            //             return this.colorScales[levelId](d.data.name);
+            //         }
+            //     }
+
+            //     return VIZ_CONFIG.colors.defaultColor;
+            // }
+
+            handleMouseOver(event, d) {
+                // Calculate percentage
+                const root = d.ancestors().find(node => node.depth === 0);
+                const percentage = (100 * d.value / root.value).toFixed(1);
+
+                // Get sequence
+                const sequence = d.ancestors().reverse().slice(1);
+
+                // Update center info
+                this.updateCenterText(null, d, percentage);
+
+                // Highlight sequence
+                this.highlightSequence(sequence);
+
+                // Show tooltip
+                this.showTooltip(event, d, percentage);
+            }
+
+            handleMouseMove(event) {
+                // Update tooltip position
+                this.tooltip.style.left = (event.pageX + 15) + 'px';
+                this.tooltip.style.top = (event.pageY - 10) + 'px';
+            }
+
+            handleMouseOut() {
+                // Hide tooltip
+                this.tooltip.style.visibility = 'hidden';
+
+                // Reset center text if no node is selected
+                if (!this.selectedNode) {
+                    this.updateCenterText(this.currentRoot);
+                }
+
+                // Reset highlight if no node is selected
+                if (!this.selectedNode) {
+                    this.resetHighlight();
+                }
+            }
+
+            handleClick(event, d) {
+                // Toggle selection
+                if (this.selectedNode === d) {
+                    this.selectedNode = null;
+                    this.resetZoom();
+                } else {
+                    this.selectedNode = d;
+                    this.zoomToNode(d);
+                }
+
+                // Stop event propagation
+                event.stopPropagation();
+            }
+
+            showTooltip(event, d, percentage) {
+                // Create tooltip content
+                const sequence = d.ancestors().reverse().slice(1);
+                const sequenceLabels = this.formatSequence(sequence);
+
+                const content = `
+                    <div class="tooltip-title">${sequenceLabels}</div>
+                    <div class="tooltip-value">
+                        <div class="tooltip-label">Nombre:</div>
+                        <div>${this.formatNumber(d.value)}</div>
+                    </div>
+                    <div class="tooltip-value">
+                        <div class="tooltip-label">Pourcentage:</div>
+                        <div>${percentage}%</div>
+                    </div>
+                `;
+
+                // Set tooltip content and position
+                this.tooltip.innerHTML = content;
+                this.tooltip.style.left = (event.pageX + 15) + 'px';
+                this.tooltip.style.top = (event.pageY - 10) + 'px';
+                this.tooltip.style.visibility = 'visible';
+            }
+
+            updateCenterText(root = null, node = null, percentage = null) {
+                if (root) {
+                    // Show total information
+                    this.centerPercentage.textContent = '100%';
+                    this.centerSequence.textContent = 'Tous les accidents';
+                    this.centerCount.textContent = `Total: ${this.formatNumber(root.value)}`;
+                } else if (node) {
+                    // Show node information
+                    this.centerPercentage.textContent = `${percentage}%`;
+
+                    const sequence = node.ancestors().reverse().slice(1);
+                    this.centerSequence.textContent = this.formatSequence(sequence);
+
+                    this.centerCount.textContent = `${this.formatNumber(node.value)} accidents`;
+                } else {
+                    // Clear information
+                    this.centerPercentage.textContent = '';
+                    this.centerSequence.textContent = '';
+                    this.centerCount.textContent = '';
+                }
+            }
+
+            formatSequence(sequence) {
+                return sequence.map((node, index) => {
+                    const levelId = index < this.selectedLevels.length ? this.selectedLevels[index].id : null;
+                    if (!levelId) return node.data.name;
+
+                    const scaleInfo = VIZ_CONFIG.colorScales[levelId];
+                    return scaleInfo?.labels[node.data.name] || node.data.name;
+                }).join(' > ');
+            }
+
+            formatNumber(num) {
+                return new Intl.NumberFormat().format(num || 0);
+            }
+
+            highlightSequence(sequence) {
+                if (!sequence || sequence.length === 0) return;
+
+                // Create a set for faster lookups
+                const highlightSet = new Set(sequence);
+
+                // Apply highlighting
+                this.chart.selectAll('path')
+                    .style('opacity', node =>
+                        highlightSet.has(node) ?
+                            VIZ_CONFIG.colors.opacity.highlight :
+                            VIZ_CONFIG.colors.opacity.fade
+                    )
+                    .style('stroke-width', node =>
+                        highlightSet.has(node) ? 1.5 : 0.5
+                    );
+            }
+
+            // highlightCategory(levelId, category) {
+            //     // Find level index in the currently selected levels
+            //     const levelIndex = this.selectedLevels.findIndex(l => l.id === levelId);
+            //     if (levelIndex === -1) return;
+
+            //     // Apply highlighting
+            //     this.chart.selectAll('path')
+            //         .style('opacity', node => {
+            //             // This ensures we're highlighting the correct level and category
+            //             if (node.depth === levelIndex + 1 && node.data.name === category) {
+            //                 return VIZ_CONFIG.colors.opacity.highlight;
+            //             }
+
+            //             // If it's a parent or child of the highlighted category, keep semi-visible
+            //             if (node.depth < levelIndex + 1) {
+            //                 // Check if this node is an ancestor of any highlighted node
+            //                 const hasHighlightedDescendant = node.descendants().some(descendant =>
+            //                     descendant.depth === levelIndex + 1 &&
+            //                     descendant.data.name === category
+            //                 );
+            //                 return hasHighlightedDescendant ?
+            //                     VIZ_CONFIG.colors.opacity.default :
+            //                     VIZ_CONFIG.colors.opacity.fade;
+            //             } else if (node.depth > levelIndex + 1) {
+            //                 // Check if this node is a descendant of the highlighted node
+            //                 const hasHighlightedAncestor = node.ancestors().some(ancestor =>
+            //                     ancestor.depth === levelIndex + 1 &&
+            //                     ancestor.data.name === category
+            //                 );
+            //                 return hasHighlightedAncestor ?
+            //                     VIZ_CONFIG.colors.opacity.default :
+            //                     VIZ_CONFIG.colors.opacity.fade;
+            //             }
+
+            //             return VIZ_CONFIG.colors.opacity.fade;
+            //         })
+            //         .style('stroke-width', node =>
+            //             (node.depth === levelIndex + 1 && node.data.name === category) ? 1.5 : 0.5
+            //         );
+            // }
+
+            // In the SunburstViz class, modify the getNodeColor method:
+
+            getNodeColor(d) {
+                if (d.depth === 0) return 'none';
+
+                // Map the actual depth to the selected level
+                if (d.depth <= this.selectedLevels.length) {
+                    const levelId = this.selectedLevels[d.depth - 1].id;
+                    if (levelId && this.colorScales[levelId]) {
+                        return this.colorScales[levelId](d.data.name);
+                    }
+                }
+
+                return VIZ_CONFIG.colors.defaultColor;
+            }
+
+            // Then, modify the highlightCategory method to ensure proper level mapping:
+
+            highlightCategory(levelId, category) {
+                // Find the position of this level in the current selection
+                const levelPosition = this.selectedLevels.findIndex(l => l.id === levelId);
+
+                if (levelPosition === -1) return;
+
+                // The actual depth in the hierarchy is levelPosition + 1 (root is at depth 0)
+                const targetDepth = levelPosition + 1;
+
+                // Apply highlighting
+                this.chart.selectAll('path')
+                    .style('opacity', node => {
+                        // Check if this node is at the right depth and has the right name
+                        const isTarget = (node.depth === targetDepth && node.data.name === category);
+
+                        if (isTarget) {
+                            return VIZ_CONFIG.colors.opacity.highlight;
+                        }
+
+                        // Check if this node is part of the highlighted path
+                        if (node.depth < targetDepth) {
+                            // Is this an ancestor of any highlighted node?
+                            const hasHighlightedDescendant = node.descendants().some(d =>
+                                d.depth === targetDepth && d.data.name === category
+                            );
+                            return hasHighlightedDescendant ?
+                                VIZ_CONFIG.colors.opacity.default :
+                                VIZ_CONFIG.colors.opacity.fade;
+                        } else if (node.depth > targetDepth) {
+                            // Is this a descendant of the highlighted node?
+                            const hasHighlightedAncestor = node.ancestors().some(a =>
+                                a.depth === targetDepth && a.data.name === category
+                            );
+                            return hasHighlightedAncestor ?
+                                VIZ_CONFIG.colors.opacity.default :
+                                VIZ_CONFIG.colors.opacity.fade;
+                        }
+
+                        return VIZ_CONFIG.colors.opacity.fade;
+                    })
+                    .style('stroke-width', node =>
+                        (node.depth === targetDepth && node.data.name === category) ? 1.5 : 0.5
+                    );
+            }
+
+            resetHighlight() {
+                if (this.selectedNode) {
+                    // If a node is selected, maintain its highlight
+                    const sequence = this.selectedNode.ancestors().reverse().slice(1);
+                    this.highlightSequence(sequence);
+                } else {
+                    // Reset to default state
+                    this.chart.selectAll('path')
+                        .style('opacity', VIZ_CONFIG.colors.opacity.default)
+                        .style('stroke-width', 0.5);
+                }
+            }
+            zoomToNode(d) {
+                if (!d) return;
+
+                // Get sequence
+                const sequence = d.ancestors().reverse().slice(1);
+
+                // Highlight sequence
+                this.highlightSequence(sequence);
+
+                // Update center text
+                const root = d.ancestors().find(node => node.depth === 0);
+                const percentage = (100 * d.value / root.value).toFixed(1);
+                this.updateCenterText(null, d, percentage);
+
+                // Create transition
+                const t = d3.transition().duration(750);
+
+                // Apply zoom effect
+                this.chart.selectAll('path')
+                    .transition(t)
+                    .style('opacity', node =>
+                        (node === d || node.ancestors().includes(d)) ?
+                            VIZ_CONFIG.colors.opacity.highlight :
+                            VIZ_CONFIG.colors.opacity.fade
+                    );
+            }
+
+            resetZoom() {
+                // Clear selected node
+                this.selectedNode = null;
+
+                // Reset highlight
+                this.resetHighlight();
+
+                // If data exists, update
+                if (this.data) {
+                    this.update(this.data);
+                }
+            }
+
+            toggleLevel(levelId, isActive) {
+                // Find level info
+                const levelInfo = VIZ_CONFIG.levels.find(l => l.id === levelId);
+                if (!levelInfo) return;
+
+                // Get current levels
+                const newLevels = [...this.selectedLevels];
+
+                if (isActive) {
+                    // Add level if not already present
+                    if (!newLevels.some(l => l.id === levelId)) {
+                        // Insert in original order
+                        const originalIndex = VIZ_CONFIG.levels.findIndex(l => l.id === levelId);
+                        let inserted = false;
+
+                        for (let i = 0; i < newLevels.length; i++) {
+                            const currentIndex = VIZ_CONFIG.levels.findIndex(l => l.id === newLevels[i].id);
+                            if (originalIndex < currentIndex) {
+                                newLevels.splice(i, 0, levelInfo);
+                                inserted = true;
+                                break;
+                            }
+                        }
+
+                        if (!inserted) {
+                            newLevels.push(levelInfo);
+                        }
+                    }
+                } else {
+                    // Remove level
+                    const index = newLevels.findIndex(l => l.id === levelId);
+                    if (index !== -1) {
+                        newLevels.splice(index, 1);
+                    }
+                }
+
+                // Ensure at least one level is selected
+                if (newLevels.length === 0) {
+                    // Re-check the checkbox
+                    const checkbox = Array.from(this.levelSelector.querySelectorAll('input'))
+                        .find(input => input.value === levelId);
+                    if (checkbox) checkbox.checked = true;
+                    return;
+                }
+
+                // Update levels
+                this.selectedLevels = newLevels;
+
+                // Clear selected node
+                this.selectedNode = null;
+
+                // Update legend
+                this.createLegend();
+
+                // Key fix: Keep track of the level IDs in the current order for extractSequences
+                this.currentLevelOrder = this.selectedLevels.map(l => l.id);
+
+                // Update visualization
+                if (this.data) {
+                    this.update(this.data);
+                }
+            }
+
+            handleResize() {
+                // Update dimensions
+                this.setupDimensions();
+
+                // Update SVG size
+                this.svg
+                    .attr('width', this.width)
+                    .attr('height', this.height);
+
+                // Update chart position
+                this.chart
+                    .attr('transform', `translate(${this.width / 2}, ${this.height / 2})`);
+
+                // Update radius and arcs
+                this.radius = Math.min(this.width, this.height) / 2 - 40;
+                this.arc = d3.arc()
+                    .startAngle(d => d.x0)
+                    .endAngle(d => d.x1)
+                    .padAngle(0.01)
+                    .padRadius(this.radius / 2)
+                    .innerRadius(d => Math.max(d.y0 * this.radius, 10))
+                    .outerRadius(d => Math.max(d.y1 * this.radius - 1, 11));
+
+                // Update visualization
+                if (this.data) {
+                    this.update(this.data);
+                }
+            }
+
+            exportSVG() {
+                try {
+                    // Create SVG clone
+                    const svgClone = this.svg.node().cloneNode(true);
+
+                    // Add required attributes
+                    d3.select(svgClone)
+                        .attr('xmlns', 'http://www.w3.org/2000/svg')
+                        .attr('version', '1.1');
+
+                    // Convert to string
+                    const serializer = new XMLSerializer();
+                    const svgString = serializer.serializeToString(svgClone);
+
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+                    link.download = 'accident_sunburst.svg';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch (error) {
+                    console.error('Error exporting SVG:', error);
+                }
+            }
+        }
+
+        /**
+         * AccidentSequences class - direct integration with your real implementation
+         * This is a placeholder that will be replaced by your actual class
+         */
+        // class AccidentSequences {
+        //     constructor() {
+        //         // This is a direct integration with your real class
+        //         console.log("AccidentSequences initialized");
+        //     }
+
+        //     async createHierarchicalData() {
+        //         console.log("Getting real hierarchical data");
+
+        //         try {
+        //             // Import your actual AccidentSequences module
+        //             // If it's already available globally, you can use it directly
+
+        //             // For testing/demonstration purposes only:
+        //             // This should be replaced with your actual data
+        //             const data = {
+        //                 name: "root",
+        //                 children: [
+        //                     {
+        //                         name: "plein-jour",
+        //                         children: [
+        //                             {
+        //                                 name: "normal",
+        //                                 children: [
+        //                                     {
+        //                                         name: "en-agglomeration",
+        //                                         children: [
+        //                                             { name: "indemne", value: 120 },
+        //                                             { name: "blesse-leger", value: 80 },
+        //                                             { name: "hospitalise", value: 40 },
+        //                                             { name: "tue", value: 10 }
+        //                                         ]
+        //                                     },
+        //                                     {
+        //                                         name: "hors-agglomeration",
+        //                                         children: [
+        //                                             { name: "indemne", value: 60 },
+        //                                             { name: "blesse-leger", value: 50 },
+        //                                             { name: "hospitalise", value: 30 },
+        //                                             { name: "tue", value: 10 }
+        //                                         ]
+        //                                     }
+        //                                 ]
+        //                             },
+        //                             {
+        //                                 name: "pluie-legere",
+        //                                 children: [
+        //                                     {
+        //                                         name: "en-agglomeration",
+        //                                         children: [
+        //                                             { name: "indemne", value: 50 },
+        //                                             { name: "blesse-leger", value: 40 },
+        //                                             { name: "hospitalise", value: 20 },
+        //                                             { name: "tue", value: 10 }
+        //                                         ]
+        //                                     },
+        //                                     {
+        //                                         name: "hors-agglomeration",
+        //                                         children: [
+        //                                             { name: "indemne", value: 30 },
+        //                                             { name: "blesse-leger", value: 30 },
+        //                                             { name: "hospitalise", value: 15 },
+        //                                             { name: "tue", value: 5 }
+        //                                         ]
+        //                                     }
+        //                                 ]
+        //                             }
+        //                         ]
+        //                     },
+        //                     {
+        //                         name: "nuit-sans-eclairage",
+        //                         children: [
+        //                             {
+        //                                 name: "normal",
+        //                                 children: [
+        //                                     {
+        //                                         name: "en-agglomeration",
+        //                                         children: [
+        //                                             { name: "indemne", value: 40 },
+        //                                             { name: "blesse-leger", value: 35 },
+        //                                             { name: "hospitalise", value: 15 },
+        //                                             { name: "tue", value: 10 }
+        //                                         ]
+        //                                     },
+        //                                     {
+        //                                         name: "hors-agglomeration",
+        //                                         children: [
+        //                                             { name: "indemne", value: 70 },
+        //                                             { name: "blesse-leger", value: 60 },
+        //                                             { name: "hospitalise", value: 35 },
+        //                                             { name: "tue", value: 15 }
+        //                                         ]
+        //                                     }
+        //                                 ]
+        //                             },
+        //                             {
+        //                                 name: "pluie-legere",
+        //                                 children: [
+        //                                     {
+        //                                         name: "en-agglomeration",
+        //                                         children: [
+        //                                             { name: "indemne", value: 15 },
+        //                                             { name: "blesse-leger", value: 15 },
+        //                                             { name: "hospitalise", value: 8 },
+        //                                             { name: "tue", value: 2 }
+        //                                         ]
+        //                                     },
+        //                                     {
+        //                                         name: "hors-agglomeration",
+        //                                         children: [
+        //                                             { name: "indemne", value: 25 },
+        //                                             { name: "blesse-leger", value: 25 },
+        //                                             { name: "hospitalise", value: 15 },
+        //                                             { name: "tue", value: 5 }
+        //                                         ]
+        //                                     }
+        //                                 ]
+        //                             }
+        //                         ]
+        //                     }
+        //                 ]
+        //             };
+
+        //             return data;
+        //         } catch (error) {
+        //             console.error("Error in AccidentSequences.createHierarchicalData:", error);
+        //             throw error;
+        //         }
+        //     }
+        // }
+
+        // Initialize visualization when the document is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            const viz = new SunburstViz();
+        });
+    </script>
 </body>
 
 </html>
