@@ -12,7 +12,10 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 main: resolve(__dirname, 'index.html'),
-                // global: resolve(__dirname, 'src/global_overview.html'),
+                about_project: resolve(__dirname, 'src/about_project.html'),
+                methodology: resolve(__dirname, 'src/methodology.html'),
+                data_source: resolve(__dirname, 'src/data_source.html'),
+                contact: resolve(__dirname, 'src/contact.html'),
                 sunburst: resolve(__dirname, 'src/accident_sequences.html'),
             },
             output: {

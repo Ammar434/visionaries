@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vélo Sécurité | Understanding Bicycle Accidents</title>
+    <title>Vizionaries | Understanding Bicycle Accidents</title>
     <style>
         /* Modern CSS Reset and Base Styles */
         * {
@@ -521,25 +521,24 @@
 
     <section class="key-insights" id="insights">
         <div class="container">
-            <h2 class="scroll-animation">Key Insights</h2>
+            <h2 class="scroll-animation">Notable Findings</h2>
             <div class="insights-container">
                 <div class="insight-card scroll-animation">
-                    <div class="insight-icon">📅</div>
-                    <h3>Seasonal Patterns</h3>
-                    <p>Bicycle accidents show clear seasonal patterns, with peaks during summer months when cycling
-                        activity increases across France.</p>
+                    <div class="insight-icon">🌧️</div>
+                    <h3>Weather Anomaly</h3>
+                    <p>No bicycle accidents occur during rain or snow, contrary to common safety assumptions.</p>
                 </div>
                 <div class="insight-card scroll-animation">
-                    <div class="insight-icon">🏙️</div>
-                    <h3>Urban Concentration</h3>
-                    <p>Most bicycle accidents occur in urban areas, particularly in city centers where bicycle traffic
-                        interacts with dense vehicle networks.</p>
+                    <div class="insight-icon">🔄</div>
+                    <h3>Critical Turns</h3>
+                    <p>25% of bicycle accidents happen during direction changes, highlighting intersection danger zones.
+                    </p>
                 </div>
                 <div class="insight-card scroll-animation">
-                    <div class="insight-icon">⏰</div>
-                    <h3>Time of Day Impact</h3>
-                    <p>Peak commuting hours show the highest accident rates, with evening rush hour presenting
-                        particular risks for cyclists.</p>
+                    <div class="insight-icon">🚗</div>
+                    <h3> Causes</h3>
+                    <p>Cars account for 40% of bicycle accidents, while infrastructure issues contribute to over 55%.
+                    </p>
                 </div>
             </div>
         </div>
@@ -624,10 +623,10 @@
     <footer>
         <div class="container">
             <div class="footer-links">
-                <a href="#">About the Project</a>
-                <a href="#">Methodology</a>
-                <a href="#">Data Sources</a>
-                <a href="#">Contact</a>
+                <a href="./src/about_project.html">About the Project</a>
+                <a href="./src/methodology.html">Methodology</a>
+                <a href="./src/data_source.html">Data Sources</a>
+                <a href="./src/contact.html">Contact</a>
             </div>
             <p class="copyright">© 2025 Vélo Sécurité. Data provided by Observatoire national interministériel de la
                 sécurité routière.</p>
@@ -678,6 +677,9 @@
                         createTimeOfDayChart();
                         createSeasonalPatternsChart();
                         createUrbanRuralChart();
+
+                        makeChartsResponsive();
+
 
                         // Initialize scroll animations
                         initScrollAnimations();
@@ -885,29 +887,41 @@
         // Create the yearly trend chart
         function createYearlyTrendChart() {
             const container = d3.select('#yearlyTrendChart');
-            const width = parseInt(container.style('width'));
-            const height = parseInt(container.style('height'));
-            const margin = { top: 30, right: 30, bottom: 50, left: 60 };
+            container.html(""); // Clear any previous content
 
+            // Get container dimensions
+            const containerRect = container.node().getBoundingClientRect();
+            const width = containerRect.width;
+            const height = containerRect.height;
+
+            // Set margins
+            const margin = { top: 30, right: 30, bottom: 50, left: 60 };
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
+
+            // Create responsive SVG
             const svg = container.append('svg')
-                .attr('width', width)
-                .attr('height', height);
+                .attr('width', '100%')
+                .attr('height', '100%')
+                .attr('viewBox', `0 0 ${width} ${height}`)
+                .attr('preserveAspectRatio', 'xMidYMid meet');
 
             const chart = svg.append('g')
                 .attr('transform', `translate(${margin.left},${margin.top})`);
 
+            // Create scales
             const xScale = d3.scaleLinear()
                 .domain(d3.extent(yearlyData, d => d.year))
-                .range([0, width - margin.left - margin.right]);
+                .range([0, chartWidth]);
 
             const yScale = d3.scaleLinear()
                 .domain([0, d3.max(yearlyData, d => d.count) * 1.1])
-                .range([height - margin.top - margin.bottom, 0]);
+                .range([chartHeight, 0]);
 
             // Add X axis
             chart.append('g')
-                .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
-                .call(d3.axisBottom(xScale).tickFormat(d3.format('d')).ticks(10))
+                .attr('transform', `translate(0,${chartHeight})`)
+                .call(d3.axisBottom(xScale).tickFormat(d3.format('d')).ticks(width < 500 ? 5 : 10))
                 .selectAll('text')
                 .attr('transform', 'rotate(-45)')
                 .style('text-anchor', 'end');
@@ -929,21 +943,23 @@
                 .attr('stroke-width', 3)
                 .attr('d', line);
 
-            // Add dots
-            chart.selectAll('circle')
-                .data(yearlyData)
-                .enter()
-                .append('circle')
-                .attr('cx', d => xScale(d.year))
-                .attr('cy', d => yScale(d.count))
-                .attr('r', 5)
-                .attr('fill', '#0052cc');
+            // Add dots (only if there's enough space)
+            if (width > 400) {
+                chart.selectAll('circle')
+                    .data(yearlyData)
+                    .enter()
+                    .append('circle')
+                    .attr('cx', d => xScale(d.year))
+                    .attr('cy', d => yScale(d.count))
+                    .attr('r', 5)
+                    .attr('fill', '#0052cc');
+            }
 
             // Add X axis label
             chart.append('text')
                 .attr('text-anchor', 'middle')
-                .attr('x', (width - margin.left - margin.right) / 2)
-                .attr('y', height - margin.top)
+                .attr('x', chartWidth / 2)
+                .attr('y', chartHeight + 40)
                 .text('Year');
 
             // Add Y axis label
@@ -951,10 +967,9 @@
                 .attr('text-anchor', 'middle')
                 .attr('transform', 'rotate(-90)')
                 .attr('y', -margin.left + 20)
-                .attr('x', -(height - margin.top - margin.bottom) / 2)
+                .attr('x', -chartHeight / 2)
                 .text('Number of Accidents');
         }
-
         // Fixed createGravityChart function
         function createGravityChart() {
             const container = d3.select('#gravityChart');
@@ -1097,13 +1112,13 @@
                 .text('Percentage of Accidents');
 
             // Add title
-            svg.append('text')
-                .attr('text-anchor', 'middle')
-                .attr('x', width / 2)
-                .attr('y', 25)
-                .style('font-size', '16px')
-                .style('font-weight', 'bold')
-                .text('Accident Severity Distribution');
+            // svg.append('text')
+            //     .attr('text-anchor', 'middle')
+            //     .attr('x', width / 2)
+            //     .attr('y', 25)
+            //     .style('font-size', '16px')
+            //     .style('font-weight', 'bold')
+            //     .text('Accident Severity Distribution');
         }
 
         // Create time of day chart
@@ -1172,190 +1187,6 @@
                 .text('Number of Accidents');
         }
 
-        // // Replace the entire createSeasonalPatternsChart function with this simpler version
-        // function createSeasonalPatternsChart() {
-        //     console.log("Creating seasonal patterns chart...");
-        //     const container = d3.select('#seasonalPatternsChart');
-        //     container.html(""); // Clear the container
-
-        //     // Force container to be visible with fixed dimensions
-        //     container.style('display', 'block')
-        //         .style('height', '300px')
-        //         .style('width', '100%');
-
-        //     // Log container dimensions
-        //     const width = parseInt(container.style('width'));
-        //     const height = parseInt(container.style('height'));
-        //     console.log(`Seasonal chart container: width=${width}, height=${height}`);
-
-        //     // Get the monthly data directly
-        //     const monthlyData = dataProcessor.getAccidentsByMonth();
-        //     console.log("Monthly data:", monthlyData);
-
-        //     // Create a very simple SVG
-        //     const svg = container.append('svg')
-        //         .attr('width', '100%')
-        //         .attr('height', '100%');
-
-        //     // Create simple bars - avoid complex d3 scales for now
-        //     const barWidth = 30;
-        //     const spacing = 10;
-        //     const maxCount = Math.max(...monthlyData.map(d => d.count));
-        //     const heightScale = 200 / maxCount; // Scale to fit in 200px height
-
-        //     // Add title
-        //     svg.append('text')
-        //         .attr('x', 400)
-        //         .attr('y', 30)
-        //         .attr('text-anchor', 'middle')
-        //         .style('font-weight', 'bold')
-        //         .text('Seasonal Accident Patterns');
-
-        //     // Add bars manually
-        //     monthlyData.forEach((month, i) => {
-        //         const barHeight = month.count * heightScale;
-        //         const x = 100 + i * (barWidth + spacing);
-        //         const y = 250 - barHeight;
-
-        //         // Add the bar
-        //         svg.append('rect')
-        //             .attr('x', x)
-        //             .attr('y', y)
-        //             .attr('width', barWidth)
-        //             .attr('height', barHeight)
-        //             .attr('fill', '#0052cc');
-
-        //         // Add month label
-        //         svg.append('text')
-        //             .attr('x', x + barWidth / 2)
-        //             .attr('y', 265)
-        //             .attr('text-anchor', 'middle')
-        //             .style('font-size', '10px')
-        //             .text(month.month.substr(0, 3));
-
-        //         // Add count label
-        //         svg.append('text')
-        //             .attr('x', x + barWidth / 2)
-        //             .attr('y', y - 5)
-        //             .attr('text-anchor', 'middle')
-        //             .style('font-size', '10px')
-        //             .text(month.count);
-        //     });
-        // }
-
-        // function createUrbanRuralChart() {
-        //     console.log("Creating urban/rural chart...");
-        //     const container = d3.select('#urbanRuralChart');
-        //     container.html(""); // Clear the container
-
-        //     // Force container to be visible with fixed dimensions
-        //     container.style('display', 'block')
-        //         .style('height', '300px')
-        //         .style('width', '100%');
-
-        //     // Log container dimensions
-        //     const width = parseInt(container.style('width'));
-        //     const height = parseInt(container.style('height'));
-        //     console.log(`Urban/Rural chart container: width=${width}, height=${height}`);
-
-        //     // Get the urban/rural data
-        //     const locationData = dataProcessor.getUrbanVsRuralAccidents();
-        //     const total = locationData.reduce((sum, item) => sum + item.count, 0);
-
-        //     // Calculate percentages
-        //     locationData.forEach(item => {
-        //         item.percentage = Math.round((item.count / total) * 100);
-        //     });
-
-        //     console.log("Location data with percentages:", locationData);
-
-        //     // Create a very simple SVG
-        //     const svg = container.append('svg')
-        //         .attr('width', '100%')
-        //         .attr('height', '100%');
-
-        //     // Add title
-        //     svg.append('text')
-        //         .attr('x', 400)
-        //         .attr('y', 30)
-        //         .attr('text-anchor', 'middle')
-        //         .style('font-weight', 'bold')
-        //         .text('Urban vs Rural Distribution');
-
-        //     // Create a simple pie chart manually
-        //     const centerX = 400;
-        //     const centerY = 150;
-        //     const radius = 100;
-
-        //     // Create pie slices
-        //     const urbanPercentage = locationData[0].percentage / 100;
-        //     const ruralPercentage = locationData[1].percentage / 100;
-
-        //     // Urban slice (blue)
-        //     svg.append('path')
-        //         .attr('d', describeArc(centerX, centerY, radius, 0, urbanPercentage * 360))
-        //         .attr('fill', '#1f78b4');
-
-        //     // Rural slice (green)
-        //     svg.append('path')
-        //         .attr('d', describeArc(centerX, centerY, radius, urbanPercentage * 360, 360))
-        //         .attr('fill', '#33a02c');
-
-        //     // Add center circle (donut hole)
-        //     svg.append('circle')
-        //         .attr('cx', centerX)
-        //         .attr('cy', centerY)
-        //         .attr('r', radius * 0.6)
-        //         .attr('fill', 'white');
-
-        //     // Add percentage labels
-        //     svg.append('text')
-        //         .attr('x', centerX)
-        //         .attr('y', centerY - 10)
-        //         .attr('text-anchor', 'middle')
-        //         .style('font-size', '18px')
-        //         .style('font-weight', 'bold')
-        //         .text(`${locationData[0].percentage}%`);
-
-        //     svg.append('text')
-        //         .attr('x', centerX)
-        //         .attr('y', centerY + 20)
-        //         .attr('text-anchor', 'middle')
-        //         .style('font-size', '14px')
-        //         .text('Urban');
-
-        //     // Add a legend
-        //     svg.append('rect')
-        //         .attr('x', 600)
-        //         .attr('y', 120)
-        //         .attr('width', 20)
-        //         .attr('height', 20)
-        //         .attr('fill', '#1f78b4');
-
-        //     svg.append('text')
-        //         .attr('x', 630)
-        //         .attr('y', 135)
-        //         .text(`Urban: ${locationData[0].percentage}%`);
-
-        //     svg.append('rect')
-        //         .attr('x', 600)
-        //         .attr('y', 150)
-        //         .attr('width', 20)
-        //         .attr('height', 20)
-        //         .attr('fill', '#33a02c');
-
-        //     svg.append('text')
-        //         .attr('x', 630)
-        //         .attr('y', 165)
-        //         .text(`Rural: ${locationData[1].percentage}%`);
-
-        //     // Add total count
-        //     svg.append('text')
-        //         .attr('x', centerX)
-        //         .attr('y', centerY + 80)
-        //         .attr('text-anchor', 'middle')
-        //         .text(`Total: ${total.toLocaleString()} accidents`);
-        // }
 
         // Fix for Seasonal Patterns Chart
         function createSeasonalPatternsChart() {
@@ -1398,12 +1229,12 @@
             const heightScale = (height * 0.7) / maxCount; // Use 70% of container height
 
             // Add title - center it based on container width
-            svg.append('text')
-                .attr('x', centerX)
-                .attr('y', 30)
-                .attr('text-anchor', 'middle')
-                .style('font-weight', 'bold')
-                .text('Seasonal Accident Patterns');
+            // svg.append('text')
+            //     .attr('x', centerX)
+            //     .attr('y', 30)
+            //     .attr('text-anchor', 'middle')
+            //     .style('font-weight', 'bold')
+            //     .text('Seasonal Accident Patterns');
 
             // Add bars centered in container
             monthlyData.forEach((month, i) => {
@@ -1475,12 +1306,12 @@
             const centerX = width / 2;
 
             // Add title
-            svg.append('text')
-                .attr('x', centerX)
-                .attr('y', 30)
-                .attr('text-anchor', 'middle')
-                .style('font-weight', 'bold')
-                .text('Urban vs Rural Distribution');
+            // svg.append('text')
+            //     .attr('x', centerX)
+            //     .attr('y', 60)
+            //     .attr('text-anchor', 'middle')
+            //     .style('font-weight', 'bold')
+            //     .text('Urban vs Rural Distribution');
 
             // Use a smaller, properly centered pie chart
             const radius = Math.min(width, height) / 3; // Use 1/3 of smallest dimension
@@ -1585,6 +1416,19 @@
                 y: centerY + (radius * Math.sin(angleInRadians))
             };
         }
+
+        function makeChartsResponsive() {
+            // Add resize event listener to redraw charts when window size changes
+            window.addEventListener('resize', function () {
+                // Redraw all charts when window resizes
+                createYearlyTrendChart();
+                createGravityChart();
+                createTimeOfDayChart();
+                createSeasonalPatternsChart();
+                createUrbanRuralChart();
+            });
+        }
+
     </script>
 </body>
 

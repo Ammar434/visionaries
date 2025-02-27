@@ -236,7 +236,6 @@ const ACCIDENT_MAPPINGS = {
         '00': 'inconnu'
     }
 };
-
 export const VIZ_CONFIG = {
     dimensions: {
         width: 750,
@@ -259,250 +258,127 @@ export const VIZ_CONFIG = {
             fade: 0.3
         }
     },
-    // colorScales: {
-    //     timeOfDay: {
-    //         title: "Moment de la journée",
-    //         domain: ['plein-jour', 'crepuscule', 'nuit-sans-eclairage', 'nuit-eclairage-eteint', 'nuit-eclairage-allume'],
-    //         range: ['#ffd700', '#ffa500', '#2c3e50', '#34495e', '#7f8c8d'],
-    //         labels: {
-    //             'plein-jour': 'Plein jour',
-    //             'crepuscule': 'Crépuscule',
-    //             'nuit-sans-eclairage': 'Nuit (sans éclairage)',
-    //             'nuit-eclairage-eteint': 'Nuit (éclairage éteint)',
-    //             'nuit-eclairage-allume': 'Nuit (éclairage allumé)'
-    //         }
-    //     },
-    //     weather: {
-    //         title: "Conditions météo",
-    //         domain: ['normal', 'pluie-legere', 'pluie-forte', 'neige-grele', 'brouillard', 'vent-tempete', 'temps-eblouissant', 'temps-couvert', 'autre-meteo'],
-    //         range: ['#66c2a5', '#8da0cb', '#6baed6', '#a6cee3', '#b2df8a', '#e31a1c', '#fb9a99', '#fdbf6f', '#cab2d6'],
-    //         labels: {
-    //             'normal': 'Normal',
-    //             'pluie-legere': 'Pluie légère',
-    //             'pluie-forte': 'Pluie forte',
-    //             'neige-grele': 'Neige/Grêle',
-    //             'brouillard': 'Brouillard',
-    //             'vent-tempete': 'Vent/Tempête',
-    //             'temps-eblouissant': 'Éblouissant',
-    //             'temps-couvert': 'Couvert',
-    //             'autre-meteo': 'Autre'
-    //         }
-    //     },
-    //     location: {
-    //         title: "Type de localisation",
-    //         domain: ['en-agglomeration', 'hors-agglomeration'],
-    //         range: ['#e78ac3', '#a6d854'],
-    //         labels: {
-    //             'en-agglomeration': 'Zone urbaine',
-    //             'hors-agglomeration': 'Zone rurale'
-    //         }
-    //     },
-    //     roadType: {
-    //         title: "Type de route",
-    //         domain: ['autoroute', 'nationale', 'departementale', 'communale', 'metropole', 'autre-route'],
-    //         range: ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#999999'],
-    //         labels: {
-    //             'autoroute': 'Autoroute',
-    //             'nationale': 'Nationale',
-    //             'departementale': 'Départementale',
-    //             'communale': 'Communale',
-    //             'metropole': 'Métropole',
-    //             'autre-route': 'Autre'
-    //         }
-    //     },
-    //     cyclePath: {
-    //         title: "Aménagement cyclable",
-    //         domain: ['standard', 'piste-cyclable', 'bande-cyclable', 'voie-reservee'],
-    //         range: ['#999999', '#66c2a5', '#fc8d62', '#8da0cb'],
-    //         labels: {
-    //             'standard': 'Sans aménagement',
-    //             'piste-cyclable': 'Piste cyclable',
-    //             'bande-cyclable': 'Bande cyclable',
-    //             'voie-reservee': 'Voie réservée'
-    //         }
-    //     },
-    //     interactionType: {
-    //         title: "Type d'interaction",
-    //         domain: ['seul', 'avec-vehicule', 'avec-pieton', 'avec-infrastructure', 'interaction-inconnue'],
-    //         range: ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3', '#a6d854'],
-    //         labels: {
-    //             'seul': 'Accident seul',
-    //             'avec-vehicule': 'Avec véhicule',
-    //             'avec-pieton': 'Avec piéton',
-    //             'avec-infrastructure': 'Avec obstacle',
-    //             'interaction-inconnue': 'Interaction inconnue'
-    //         }
-    //     },
-    //     collision: {
-    //         title: "Type de collision",
-    //         domain: ['collision-frontale', 'collision-arriere', 'collision-cote', 'collision-chaine', 'collision-multiple', 'autre-collision', 'sans-collision'],
-    //         range: ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628'],
-    //         labels: {
-    //             'collision-frontale': 'Frontale',
-    //             'collision-arriere': 'Par l\'arrière',
-    //             'collision-cote': 'Par le côté',
-    //             'collision-chaine': 'En chaîne',
-    //             'collision-multiple': 'Multiple',
-    //             'autre-collision': 'Autre collision',
-    //             'sans-collision': 'Sans collision'
-    //         }
-    //     },
-    //     maneuver: {
-    //         title: "Manœuvre",
-    //         domain: ['sans-changement', 'changement-direction', 'depassement', 'stationnement', 'traversee', 'autre-manoeuvre'],
-    //         range: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'],
-    //         labels: {
-    //             'sans-changement': 'En ligne droite',
-    //             'changement-direction': 'Changement de direction',
-    //             'depassement': 'Dépassement',
-    //             'stationnement': 'Stationnement',
-    //             'traversee': 'Traversée',
-    //             'autre-manoeuvre': 'Autre manœuvre'
-    //         }
-    //     },
-    //     severity: {
-    //         title: "Gravité des blessures",
-    //         domain: ['indemne', 'blesse-leger', 'hospitalise', 'tue'],
-    //         range: ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3'],
-    //         labels: {
-    //             'indemne': 'Indemne',
-    //             'blesse-leger': 'Blessure légère',
-    //             'hospitalise': 'Hospitalisé',
-    //             'tue': 'Fatal'
-    //         }
-    //     },
-    //     cycleType: {
-    //         title: "Type de vélo",
-    //         domain: ['velo-standard', 'velo-electrique'],
-    //         range: ['#1f78b4', '#33a02c'],
-    //         labels: {
-    //             'velo-standard': 'Vélo standard',
-    //             'velo-electrique': 'Vélo électrique'
-    //         }
-    //     }
-    // },
-    // Replace the colorScales in VIZ_CONFIG with this improved version
-    // This uses more distinct color schemes with better contrast
+
 
     colorScales: {
         timeOfDay: {
-            title: "Moment de la journée",
+            title: "Time of day",
             domain: ['plein-jour', 'crepuscule', 'nuit-sans-eclairage', 'nuit-eclairage-eteint', 'nuit-eclairage-allume'],
             range: ['#FFA500', '#FF6347', '#191970', '#483D8B', '#6A5ACD'],
             labels: {
-                'plein-jour': 'Plein jour',
-                'crepuscule': 'Crépuscule',
-                'nuit-sans-eclairage': 'Nuit (sans éclairage)',
-                'nuit-eclairage-eteint': 'Nuit (éclairage éteint)',
-                'nuit-eclairage-allume': 'Nuit (éclairage allumé)'
+                'plein-jour': 'Daylight',
+                'crepuscule': 'Twilight',
+                'nuit-sans-eclairage': 'Night (no public lighting)',
+                'nuit-eclairage-eteint': 'Night (no public lighting)',
+                'nuit-eclairage-allume': 'Night (public lighting on)'
             }
         },
         weather: {
-            title: "Conditions météo",
+            title: "Weather conditions",
             domain: ['normal', 'pluie-legere', 'pluie-forte', 'neige-grele', 'brouillard', 'vent-tempete', 'temps-eblouissant', 'temps-couvert', 'autre-meteo'],
             range: ['#4CAF50', '#81C784', '#1976D2', '#0D47A1', '#B2EBF2', '#F44336', '#FFEB3B', '#78909C', '#9C27B0'],
             labels: {
                 'normal': 'Normal',
-                'pluie-legere': 'Pluie légère',
-                'pluie-forte': 'Pluie forte',
-                'neige-grele': 'Neige/Grêle',
-                'brouillard': 'Brouillard',
-                'vent-tempete': 'Vent/Tempête',
-                'temps-eblouissant': 'Éblouissant',
-                'temps-couvert': 'Couvert',
-                'autre-meteo': 'Autre'
+                'pluie-legere': 'Light rain',
+                'pluie-forte': 'Heavy rain',
+                'neige-grele': 'Snow/Hail',
+                'brouillard': 'Fog',
+                'vent-tempete': 'Wind/Storm',
+                'temps-eblouissant': 'Blinding conditions',
+                'temps-couvert': 'Overcast',
+                'autre-meteo': 'Other weather'
             }
         },
         location: {
-            title: "Type de localisation",
+            title: "Location type",
             domain: ['en-agglomeration', 'hors-agglomeration'],
             range: ['#D81B60', '#2E7D32'],
             labels: {
-                'en-agglomeration': 'Zone urbaine',
-                'hors-agglomeration': 'Zone rurale'
+                'en-agglomeration': 'Urban area',
+                'hors-agglomeration': 'Rural area'
             }
         },
         roadType: {
-            title: "Type de route",
+            title: "Road type",
             domain: ['autoroute', 'nationale', 'departementale', 'communale', 'metropole', 'autre-route'],
             range: ['#B71C1C', '#1565C0', '#33691E', '#6A1B9A', '#EF6C00', '#546E7A'],
             labels: {
-                'autoroute': 'Autoroute',
-                'nationale': 'Nationale',
-                'departementale': 'Départementale',
-                'communale': 'Communale',
-                'metropole': 'Métropole',
-                'autre-route': 'Autre'
+                'autoroute': 'Highway',
+                'nationale': 'National road',
+                'departementale': 'Departmental road',
+                'communale': 'Local road (communal)',
+                'metropole': 'Metropolitan road',
+                'autre-route': 'Other road'
             }
         },
         cyclePath: {
-            title: "Aménagement cyclable",
+            title: "Cycling infrastructure",
             domain: ['standard', 'piste-cyclable', 'bande-cyclable', 'voie-reservee'],
             range: ['#757575', '#00897B', '#E65100', '#3949AB'],
             labels: {
-                'standard': 'Sans aménagement',
-                'piste-cyclable': 'Piste cyclable',
-                'bande-cyclable': 'Bande cyclable',
-                'voie-reservee': 'Voie réservée'
+                'standard': 'No infrastructure',
+                'piste-cyclable': 'Bike path',
+                'bande-cyclable': 'Bike lane',
+                'voie-reservee': 'Reserved lane'
             }
         },
         interactionType: {
-            title: "Type d'interaction",
+            title: "Interaction type",
             domain: ['seul', 'avec-vehicule', 'avec-pieton', 'avec-infrastructure', 'interaction-inconnue'],
             range: ['#00ACC1', '#FF5722', '#5E35B1', '#827717', '#8D6E63'],
             labels: {
-                'seul': 'Accident seul',
-                'avec-vehicule': 'Avec véhicule',
-                'avec-pieton': 'Avec piéton',
-                'avec-infrastructure': 'Avec obstacle',
-                'interaction-inconnue': 'Interaction inconnue'
+                'seul': 'Alone',
+                'avec-vehicule': 'With vehicle',
+                'avec-pieton': 'With pedestrian',
+                'avec-infrastructure': 'With obstacle',
+                'interaction-inconnue': 'Unknown interaction'
             }
         },
         collision: {
-            title: "Type de collision",
+            title: "Collision type",
             domain: ['collision-frontale', 'collision-arriere', 'collision-cote', 'collision-chaine', 'collision-multiple', 'autre-collision', 'sans-collision'],
             range: ['#D32F2F', '#1976D2', '#388E3C', '#7B1FA2', '#FBC02D', '#E64A19', '#5D4037'],
             labels: {
-                'collision-frontale': 'Frontale',
-                'collision-arriere': 'Par l\'arrière',
-                'collision-cote': 'Par le côté',
-                'collision-chaine': 'En chaîne',
-                'collision-multiple': 'Multiple',
-                'autre-collision': 'Autre collision',
-                'sans-collision': 'Sans collision'
+                'collision-frontale': 'Frontal',
+                'collision-arriere': 'Rear-end',
+                'collision-cote': 'Side',
+                'collision-chaine': 'Chain (more than 3 cars involved)',
+                'collision-multiple': 'Multiple (more than 3 cars involved and multiple colision point)',
+                'autre-collision': 'Other collision',
+                'sans-collision': 'No collision'
             }
         },
         maneuver: {
-            title: "Manœuvre",
+            title: "Maneuver",
             domain: ['sans-changement', 'changement-direction', 'depassement', 'stationnement', 'traversee', 'autre-manoeuvre'],
             range: ['#0288D1', '#D81B60', '#689F38', '#FFA000', '#5E35B1', '#607D8B'],
             labels: {
-                'sans-changement': 'En ligne droite',
-                'changement-direction': 'Changement de direction',
-                'depassement': 'Dépassement',
-                'stationnement': 'Stationnement',
-                'traversee': 'Traversée',
-                'autre-manoeuvre': 'Autre manœuvre'
+                'sans-changement': 'Straight line',
+                'changement-direction': 'Direction change',
+                'depassement': 'Overtaking',
+                'stationnement': 'Parking',
+                'traversee': 'Crossing',
+                'autre-manoeuvre': 'Other maneuver'
             }
         },
         severity: {
-            title: "Gravité des blessures",
+            title: "Injury severity",
             domain: ['indemne', 'blesse-leger', 'hospitalise', 'tue'],
             range: ['#4CAF50', '#FFC107', '#FF9800', '#F44336'],
             labels: {
-                'indemne': 'Indemne',
-                'blesse-leger': 'Blessure légère',
-                'hospitalise': 'Hospitalisé',
+                'indemne': 'Uninjured',
+                'blesse-leger': 'Minor injury',
+                'hospitalise': 'Hospitalized',
                 'tue': 'Fatal'
             }
         },
         cycleType: {
-            title: "Type de vélo",
+            title: "Bicycle type",
             domain: ['velo-standard', 'velo-electrique'],
             range: ['#2196F3', '#4CAF50'],
             labels: {
-                'velo-standard': 'Vélo standard',
-                'velo-electrique': 'Vélo électrique'
+                'velo-standard': 'Standard bicycle',
+                'velo-electrique': 'Electric bicycle'
             }
         }
     },
@@ -512,18 +388,290 @@ export const VIZ_CONFIG = {
         delay: 50
     },
     levels: [
-        { id: 'timeOfDay', name: 'Moment de la journée' },
-        { id: 'weather', name: 'Conditions météo' },
-        { id: 'location', name: 'Localisation' },
-        { id: 'roadType', name: 'Type de route' },
-        { id: 'cyclePath', name: 'Aménagement cyclable' },
-        { id: 'interactionType', name: 'Type d\'interaction' },
-        { id: 'collision', name: 'Type de collision' },
-        { id: 'maneuver', name: 'Manœuvre' },
-        { id: 'severity', name: 'Gravité' },
-        { id: 'cycleType', name: 'Type de vélo' }
+        // { id: 'timeOfDay', name: 'Moment de la journée' },
+        // { id: 'weather', name: 'Conditions météo' },
+        // { id: 'location', name: 'Localisation' },
+        // { id: 'roadType', name: 'Type de route' },
+        // { id: 'cyclePath', name: 'Aménagement cyclable' },
+        // { id: 'interactionType', name: 'Type d\'interaction' },
+        // { id: 'collision', name: 'Type de collision' },
+        // { id: 'maneuver', name: 'Manœuvre' },
+        // { id: 'severity', name: 'Gravité' },
+        // { id: 'cycleType', name: 'Type de vélo' }
+
+        { id: 'timeOfDay', name: 'Time of day' },
+        { id: 'weather', name: 'Weather conditions' },
+        { id: 'location', name: 'Location' },
+        { id: 'roadType', name: 'Road type' },
+        { id: 'cyclePath', name: 'Cycling infrastructure' },
+        { id: 'interactionType', name: 'Interaction type' },
+        { id: 'collision', name: 'Collision type' },
+        { id: 'maneuver', name: 'Maneuver' },
+        { id: 'severity', name: 'Injury severity' },
+        { id: 'cycleType', name: 'Bicycle type' }
     ]
 };
+
+
+// const ACCIDENT_MAPPINGS = {
+//     timeOfDay: {
+//         '1': 'daylight',
+//         '2': 'twilight',
+//         '3': 'night-no-lighting',
+//         '4': 'night-lighting-off',
+//         '5': 'night-lighting-on',
+//         '-1': 'unknown'
+//     },
+//     weather: {
+//         '1': 'normal',
+//         '2': 'light-rain',
+//         '3': 'heavy-rain',
+//         '4': 'snow-hail',
+//         '5': 'fog',
+//         '6': 'wind-storm',
+//         '7': 'blinding-conditions',
+//         '8': 'overcast',
+//         '9': 'other-weather',
+//         '-1': 'unknown'
+//     },
+//     location: {
+//         '1': 'rural-area',
+//         '2': 'urban-area',
+//         '-1': 'unknown'
+//     },
+//     gravity: {
+//         '1': 'uninjured',
+//         '2': 'fatal',
+//         '3': 'hospitalized',
+//         '4': 'minor-injury',
+//         '-1': 'unknown'
+//     },
+//     roadType: {
+//         '1': 'highway',
+//         '2': 'national-road',
+//         '3': 'departmental-road',
+//         '4': 'local-road',
+//         '5': 'off-network',
+//         '6': 'parking',
+//         '7': 'metropolitan-road',
+//         '9': 'other-road',
+//         '-1': 'unknown'
+//     },
+//     surface: {
+//         '1': 'normal',
+//         '2': 'wet',
+//         '3': 'puddles',
+//         '4': 'flooded',
+//         '5': 'snow-covered',
+//         '6': 'muddy',
+//         '7': 'icy',
+//         '8': 'oily',
+//         '9': 'other-surface',
+//         '-1': 'unknown'
+//     },
+//     infra: {
+//         '0': 'none',
+//         '1': 'tunnel',
+//         '2': 'bridge',
+//         '3': 'ramp',
+//         '4': 'rail',
+//         '5': 'intersection',
+//         '6': 'pedestrian-zone',
+//         '7': 'toll',
+//         '8': 'construction',
+//         '9': 'other-infra',
+//         '-1': 'unknown'
+//     },
+//     intersection: {
+//         '1': 'no-intersection',
+//         '2': 'x-intersection',
+//         '3': 't-intersection',
+//         '4': 'y-intersection',
+//         '5': 'multiple-intersection',
+//         '6': 'roundabout',
+//         '7': 'plaza',
+//         '8': 'level-crossing',
+//         '9': 'other-intersection',
+//         '-1': 'unknown'
+//     },
+//     collision: {
+//         '1': 'frontal-collision',
+//         '2': 'rear-collision',
+//         '3': 'side-collision',
+//         '4': 'chain-collision',
+//         '5': 'multiple-collision',
+//         '6': 'other-collision',
+//         '7': 'no-collision',
+//         '-1': 'unknown'
+//     },
+//     vosp: {
+//         '0': 'standard',
+//         '1': 'bike-path',
+//         '2': 'bike-lane',
+//         '3': 'reserved-lane',
+//         '-1': 'unknown'
+//     }
+// };
+
+// export const VIZ_CONFIG = {
+//     dimensions: {
+//         width: 750,
+//         height: 750,
+//         radiusRatio: 20,
+//         minRadiusScale: 0.2,
+//         maxRadiusScale: 0.85,
+//         padding: 0.01,
+//         legendWidth: 200,
+//         legendItemHeight: 25
+//     },
+//     colors: {
+//         defaultColor: "#ccc",
+//         backgroundColor: "#f8f9fa",
+//         textColor: "#333333",
+//         highlightColor: "#ff7f0e",
+//         opacity: {
+//             default: 0.8,
+//             highlight: 1.0,
+//             fade: 0.3
+//         }
+//     },
+
+//     colorScales: {
+//         timeOfDay: {
+//             title: "Time of day",
+//             domain: ['daylight', 'twilight', 'night-no-lighting', 'night-lighting-off', 'night-lighting-on'],
+//             range: ['#FFA500', '#FF6347', '#191970', '#483D8B', '#6A5ACD'],
+//             labels: {
+//                 'daylight': 'Daylight',
+//                 'twilight': 'Twilight',
+//                 'night-no-lighting': 'Night (no lighting)',
+//                 'night-lighting-off': 'Night (no lighting)',
+//                 'night-lighting-on': 'Night (lighting on)'
+//             }
+//         },
+//         weather: {
+//             title: "Weather conditions",
+//             domain: ['normal', 'light-rain', 'heavy-rain', 'snow-hail', 'fog', 'wind-storm', 'blinding-conditions', 'overcast', 'other-weather'],
+//             range: ['#4CAF50', '#81C784', '#1976D2', '#0D47A1', '#B2EBF2', '#F44336', '#FFEB3B', '#78909C', '#9C27B0'],
+//             labels: {
+//                 'normal': 'Normal',
+//                 'light-rain': 'Light rain',
+//                 'heavy-rain': 'Heavy rain',
+//                 'snow-hail': 'Snow/Hail',
+//                 'fog': 'Fog',
+//                 'wind-storm': 'Wind/Storm',
+//                 'blinding-conditions': 'Blinding conditions',
+//                 'overcast': 'Overcast',
+//                 'other-weather': 'Other weather'
+//             }
+//         },
+//         location: {
+//             title: "Location type",
+//             domain: ['urban-area', 'rural-area'],
+//             range: ['#D81B60', '#2E7D32'],
+//             labels: {
+//                 'urban-area': 'Urban area',
+//                 'rural-area': 'Rural area'
+//             }
+//         },
+//         roadType: {
+//             title: "Road type",
+//             domain: ['highway', 'national-road', 'departmental-road', 'local-road', 'metropolitan-road', 'other-road'],
+//             range: ['#B71C1C', '#1565C0', '#33691E', '#6A1B9A', '#EF6C00', '#546E7A'],
+//             labels: {
+//                 'highway': 'Highway',
+//                 'national-road': 'National road',
+//                 'departmental-road': 'Departmental road',
+//                 'local-road': 'Local road',
+//                 'metropolitan-road': 'Metropolitan road',
+//                 'other-road': 'Other road'
+//             }
+//         },
+//         cyclePath: {
+//             title: "Cycling infrastructure",
+//             domain: ['standard', 'bike-path', 'bike-lane', 'reserved-lane'],
+//             range: ['#757575', '#00897B', '#E65100', '#3949AB'],
+//             labels: {
+//                 'standard': 'No infrastructure',
+//                 'bike-path': 'Bike path',
+//                 'bike-lane': 'Bike lane',
+//                 'reserved-lane': 'Reserved lane'
+//             }
+//         },
+//         interactionType: {
+//             title: "Interaction type",
+//             domain: ['alone', 'with-vehicle', 'with-pedestrian', 'with-obstacle', 'unknown-interaction'],
+//             range: ['#00ACC1', '#FF5722', '#5E35B1', '#827717', '#8D6E63'],
+//             labels: {
+//                 'alone': 'Alone',
+//                 'with-vehicle': 'With vehicle',
+//                 'with-pedestrian': 'With pedestrian',
+//                 'with-obstacle': 'With obstacle',
+//                 'unknown-interaction': 'Unknown interaction'
+//             }
+//         },
+//         collision: {
+//             title: "Collision type",
+//             domain: ['frontal-collision', 'rear-collision', 'side-collision', 'chain-collision', 'multiple-collision', 'other-collision', 'no-collision'],
+//             range: ['#D32F2F', '#1976D2', '#388E3C', '#7B1FA2', '#FBC02D', '#E64A19', '#5D4037'],
+//             labels: {
+//                 'frontal-collision': 'Frontal',
+//                 'rear-collision': 'Rear-end',
+//                 'side-collision': 'Side',
+//                 'chain-collision': 'Chain',
+//                 'multiple-collision': 'Multiple',
+//                 'other-collision': 'Other collision',
+//                 'no-collision': 'No collision'
+//             }
+//         },
+//         maneuver: {
+//             title: "Maneuver",
+//             domain: ['straight-line', 'direction-change', 'overtaking', 'parking', 'crossing', 'other-maneuver'],
+//             range: ['#0288D1', '#D81B60', '#689F38', '#FFA000', '#5E35B1', '#607D8B'],
+//             labels: {
+//                 'straight-line': 'Straight line',
+//                 'direction-change': 'Direction change',
+//                 'overtaking': 'Overtaking',
+//                 'parking': 'Parking',
+//                 'crossing': 'Crossing',
+//                 'other-maneuver': 'Other maneuver'
+//             }
+//         },
+//         severity: {
+//             title: "Injury severity",
+//             domain: ['uninjured', 'minor-injury', 'hospitalized', 'fatal'],
+//             range: ['#4CAF50', '#FFC107', '#FF9800', '#F44336'],
+//             labels: {
+//                 'uninjured': 'Uninjured',
+//                 'minor-injury': 'Minor injury',
+//                 'hospitalized': 'Hospitalized',
+//                 'fatal': 'Fatal'
+//             }
+//         },
+//         cycleType: {
+//             title: "Bicycle type",
+//             domain: ['standard-bicycle', 'electric-bicycle'],
+//             range: ['#2196F3', '#4CAF50'],
+//             labels: {
+//                 'standard-bicycle': 'Standard bicycle',
+//                 'electric-bicycle': 'Electric bicycle'
+//             }
+//         }
+//     },
+//     levels: [
+//         { id: 'timeOfDay', name: 'Time of day' },
+//         { id: 'weather', name: 'Weather conditions' },
+//         { id: 'location', name: 'Location' },
+//         { id: 'roadType', name: 'Road type' },
+//         { id: 'cyclePath', name: 'Cycling infrastructure' },
+//         { id: 'interactionType', name: 'Interaction type' },
+//         { id: 'collision', name: 'Collision type' },
+//         { id: 'maneuver', name: 'Maneuver' },
+//         { id: 'severity', name: 'Injury severity' },
+//         { id: 'cycleType', name: 'Bicycle type' }
+//     ]
+// };
+
 
 export class AccidentSequences {
     constructor() {
@@ -532,29 +680,6 @@ export class AccidentSequences {
         this.analyzedAccidents = [];
         this.sequencePatterns = {};
     }
-
-    // async createHierarchicalData() {
-    //     try {
-    //         // Load and process accidents
-    //         const accidents = await this.processor.loadAllYearsData();
-    //         this.bicycleAccidents = accidents;
-
-    //         // Analyze accidents to extract patterns and contexts
-    //         this.analyzedAccidents = this.enrichAccidentData(accidents);
-
-    //         // Convert to sequences for hierarchical structure
-    //         const sequences = this.extractSequences(this.analyzedAccidents);
-
-    //         // Build hierarchy for visualization
-    //         const hierarchy = this.buildHierarchy(sequences);
-
-    //         // Return the hierarchical data
-    //         return hierarchy;
-    //     } catch (error) {
-    //         console.error("Error creating hierarchical data:", error);
-    //         throw error;
-    //     }
-    // }
 
     enrichAccidentData(accidents) {
         return accidents.map(accident => {
