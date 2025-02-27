@@ -319,6 +319,7 @@
                 // Initialize selected levels (first two by default)
                 this.selectedLevels = VIZ_CONFIG.levels.slice(0, 2);
                 this.selectedNode = null;
+                this.sequences = null; // Store the sequences instance
 
                 // Initialize DOM elements
                 this.setupDOM();
@@ -382,6 +383,8 @@
             }
 
             setupColorScales() {
+                console.log("Setting up color scales with improved contrast");
+
                 // Create color scales for each level
                 this.colorScales = {};
 
@@ -389,6 +392,15 @@
                     this.colorScales[level] = d3.scaleOrdinal()
                         .domain(scale.domain)
                         .range(scale.range);
+
+                    // Log the color mapping for debugging
+                    console.log(`Color scale for ${level}:`,
+                        scale.domain.map(d => ({
+                            value: d,
+                            label: scale.labels[d] || d,
+                            color: this.colorScales[level](d)
+                        }))
+                    );
                 });
             }
 
@@ -509,64 +521,56 @@
 
                 try {
                     // Create a new instance of AccidentSequences
-                    const sequences = new AccidentSequences();
+                    this.sequences = new AccidentSequences();
 
-                    // Get hierarchical data
-                    const data = await sequences.createHierarchicalData();
+                    // Store the raw accident data
+                    this.rawAccidents = await this.sequences.enrichAccidentData(
+                        await this.sequences.processor.loadAllYearsData()
+                    );
 
-                    // Update the visualization with the real data
-                    this.data = data;
-                    this.update(data);
+                    // Generate the hierarchical data with current level order
+                    this.currentLevelOrder = this.selectedLevels.map(l => l.id);
+                    this.data = await this.regenerateHierarchy();
+
+                    // Update the visualization
+                    this.update(this.data);
 
                     console.log("Data loaded successfully");
                 } catch (error) {
                     console.error("Error loading data:", error);
-                    // No fallback - just show the error in console
                 }
+            }
+            async regenerateHierarchy() {
+                if (!this.sequences || !this.rawAccidents) {
+                    console.error("Cannot regenerate hierarchy: sequences or raw accidents not available");
+                    return null;
+                }
+
+                // Extract sequences using the current level order
+                const sequences = this.sequences.extractSequences(
+                    this.rawAccidents,
+                    this.currentLevelOrder
+                );
+
+                // Build and return the hierarchy
+                return this.sequences.buildHierarchy(sequences);
             }
             // In SunburstViz class, fix the filterDataByLevels method:
             filterDataByLevels(data) {
-                // Get level IDs from currently selected levels
-                const levelIds = this.selectedLevels.map(l => l.id);
-                const maxDepth = levelIds.length;
 
-                // Helper function to clone and filter data
-                const processNode = (node, depth = 0) => {
-                    // Create new node with the same name
-                    const newNode = { name: node.name };
 
-                    if (depth >= maxDepth) {
-                        // We've reached max depth, calculate the sum
-                        newNode.value = this.sumNodeValues(node);
-                        return newNode;
-                    }
-
-                    if (node.children && node.children.length > 0) {
-                        newNode.children = node.children.map(child =>
-                            processNode(child, depth + 1)
-                        );
-                    } else {
-                        newNode.value = node.value || 0;
-                    }
-
-                    return newNode;
-                };
-
-                return processNode(data);
+                return data;
             }
 
-            // Fix the update method to properly handle data filtering
+            // 5. Simplify the update method to use the new hierarchy directly
             update(data) {
                 console.log("Updating visualization with data");
 
                 // Store original data
                 this.data = data;
 
-                // Filter data by selected levels - no custom ordering
-                const filteredData = this.filterDataByLevels(data);
-
                 // Create hierarchy
-                const root = d3.hierarchy(filteredData)
+                const root = d3.hierarchy(data)
                     .sum(d => {
                         if (!d.children || d.children.length === 0) {
                             return d.value || 0;
@@ -872,63 +876,33 @@
                     );
             }
 
-            // highlightCategory(levelId, category) {
-            //     // Find level index in the currently selected levels
-            //     const levelIndex = this.selectedLevels.findIndex(l => l.id === levelId);
-            //     if (levelIndex === -1) return;
-
-            //     // Apply highlighting
-            //     this.chart.selectAll('path')
-            //         .style('opacity', node => {
-            //             // This ensures we're highlighting the correct level and category
-            //             if (node.depth === levelIndex + 1 && node.data.name === category) {
-            //                 return VIZ_CONFIG.colors.opacity.highlight;
-            //             }
-
-            //             // If it's a parent or child of the highlighted category, keep semi-visible
-            //             if (node.depth < levelIndex + 1) {
-            //                 // Check if this node is an ancestor of any highlighted node
-            //                 const hasHighlightedDescendant = node.descendants().some(descendant =>
-            //                     descendant.depth === levelIndex + 1 &&
-            //                     descendant.data.name === category
-            //                 );
-            //                 return hasHighlightedDescendant ?
-            //                     VIZ_CONFIG.colors.opacity.default :
-            //                     VIZ_CONFIG.colors.opacity.fade;
-            //             } else if (node.depth > levelIndex + 1) {
-            //                 // Check if this node is a descendant of the highlighted node
-            //                 const hasHighlightedAncestor = node.ancestors().some(ancestor =>
-            //                     ancestor.depth === levelIndex + 1 &&
-            //                     ancestor.data.name === category
-            //                 );
-            //                 return hasHighlightedAncestor ?
-            //                     VIZ_CONFIG.colors.opacity.default :
-            //                     VIZ_CONFIG.colors.opacity.fade;
-            //             }
-
-            //             return VIZ_CONFIG.colors.opacity.fade;
-            //         })
-            //         .style('stroke-width', node =>
-            //             (node.depth === levelIndex + 1 && node.data.name === category) ? 1.5 : 0.5
-            //         );
-            // }
-
-            // In the SunburstViz class, modify the getNodeColor method:
-
+            // Enhance the getNodeColor method to handle color fallbacks and debugging
             getNodeColor(d) {
                 if (d.depth === 0) return 'none';
 
-                // Map the actual depth to the selected level
+                // Get the level for this depth from the selected levels
                 if (d.depth <= this.selectedLevels.length) {
                     const levelId = this.selectedLevels[d.depth - 1].id;
+
                     if (levelId && this.colorScales[levelId]) {
-                        return this.colorScales[levelId](d.data.name);
+                        const color = this.colorScales[levelId](d.data.name);
+
+                        // If we're debugging, add a debug attribute to the node
+                        if (this.debugColors) {
+                            d.debugColor = {
+                                level: levelId,
+                                value: d.data.name,
+                                color: color
+                            };
+                        }
+
+                        return color;
                     }
                 }
 
+                // For unknown categories or missing color scales
                 return VIZ_CONFIG.colors.defaultColor;
             }
-
             // Then, modify the highlightCategory method to ensure proper level mapping:
 
             highlightCategory(levelId, category) {
@@ -1082,13 +1056,21 @@
                 // Update legend
                 this.createLegend();
 
-                // Key fix: Keep track of the level IDs in the current order for extractSequences
+                // Update the current level order
                 this.currentLevelOrder = this.selectedLevels.map(l => l.id);
 
-                // Update visualization
-                if (this.data) {
-                    this.update(this.data);
-                }
+                // IMPORTANT: Regenerate the hierarchy with the new level order
+                (async () => {
+                    try {
+                        const newHierarchy = await this.regenerateHierarchy();
+                        if (newHierarchy) {
+                            this.data = newHierarchy;
+                            this.update(this.data);
+                        }
+                    } catch (error) {
+                        console.error("Error regenerating hierarchy:", error);
+                    }
+                })();
             }
 
             handleResize() {
@@ -1147,140 +1129,7 @@
             }
         }
 
-        /**
-         * AccidentSequences class - direct integration with your real implementation
-         * This is a placeholder that will be replaced by your actual class
-         */
-        // class AccidentSequences {
-        //     constructor() {
-        //         // This is a direct integration with your real class
-        //         console.log("AccidentSequences initialized");
-        //     }
 
-        //     async createHierarchicalData() {
-        //         console.log("Getting real hierarchical data");
-
-        //         try {
-        //             // Import your actual AccidentSequences module
-        //             // If it's already available globally, you can use it directly
-
-        //             // For testing/demonstration purposes only:
-        //             // This should be replaced with your actual data
-        //             const data = {
-        //                 name: "root",
-        //                 children: [
-        //                     {
-        //                         name: "plein-jour",
-        //                         children: [
-        //                             {
-        //                                 name: "normal",
-        //                                 children: [
-        //                                     {
-        //                                         name: "en-agglomeration",
-        //                                         children: [
-        //                                             { name: "indemne", value: 120 },
-        //                                             { name: "blesse-leger", value: 80 },
-        //                                             { name: "hospitalise", value: 40 },
-        //                                             { name: "tue", value: 10 }
-        //                                         ]
-        //                                     },
-        //                                     {
-        //                                         name: "hors-agglomeration",
-        //                                         children: [
-        //                                             { name: "indemne", value: 60 },
-        //                                             { name: "blesse-leger", value: 50 },
-        //                                             { name: "hospitalise", value: 30 },
-        //                                             { name: "tue", value: 10 }
-        //                                         ]
-        //                                     }
-        //                                 ]
-        //                             },
-        //                             {
-        //                                 name: "pluie-legere",
-        //                                 children: [
-        //                                     {
-        //                                         name: "en-agglomeration",
-        //                                         children: [
-        //                                             { name: "indemne", value: 50 },
-        //                                             { name: "blesse-leger", value: 40 },
-        //                                             { name: "hospitalise", value: 20 },
-        //                                             { name: "tue", value: 10 }
-        //                                         ]
-        //                                     },
-        //                                     {
-        //                                         name: "hors-agglomeration",
-        //                                         children: [
-        //                                             { name: "indemne", value: 30 },
-        //                                             { name: "blesse-leger", value: 30 },
-        //                                             { name: "hospitalise", value: 15 },
-        //                                             { name: "tue", value: 5 }
-        //                                         ]
-        //                                     }
-        //                                 ]
-        //                             }
-        //                         ]
-        //                     },
-        //                     {
-        //                         name: "nuit-sans-eclairage",
-        //                         children: [
-        //                             {
-        //                                 name: "normal",
-        //                                 children: [
-        //                                     {
-        //                                         name: "en-agglomeration",
-        //                                         children: [
-        //                                             { name: "indemne", value: 40 },
-        //                                             { name: "blesse-leger", value: 35 },
-        //                                             { name: "hospitalise", value: 15 },
-        //                                             { name: "tue", value: 10 }
-        //                                         ]
-        //                                     },
-        //                                     {
-        //                                         name: "hors-agglomeration",
-        //                                         children: [
-        //                                             { name: "indemne", value: 70 },
-        //                                             { name: "blesse-leger", value: 60 },
-        //                                             { name: "hospitalise", value: 35 },
-        //                                             { name: "tue", value: 15 }
-        //                                         ]
-        //                                     }
-        //                                 ]
-        //                             },
-        //                             {
-        //                                 name: "pluie-legere",
-        //                                 children: [
-        //                                     {
-        //                                         name: "en-agglomeration",
-        //                                         children: [
-        //                                             { name: "indemne", value: 15 },
-        //                                             { name: "blesse-leger", value: 15 },
-        //                                             { name: "hospitalise", value: 8 },
-        //                                             { name: "tue", value: 2 }
-        //                                         ]
-        //                                     },
-        //                                     {
-        //                                         name: "hors-agglomeration",
-        //                                         children: [
-        //                                             { name: "indemne", value: 25 },
-        //                                             { name: "blesse-leger", value: 25 },
-        //                                             { name: "hospitalise", value: 15 },
-        //                                             { name: "tue", value: 5 }
-        //                                         ]
-        //                                     }
-        //                                 ]
-        //                             }
-        //                         ]
-        //                     }
-        //                 ]
-        //             };
-
-        //             return data;
-        //         } catch (error) {
-        //             console.error("Error in AccidentSequences.createHierarchicalData:", error);
-        //             throw error;
-        //         }
-        //     }
-        // }
 
         // Initialize visualization when the document is ready
         document.addEventListener('DOMContentLoaded', () => {

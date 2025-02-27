@@ -13,10 +13,37 @@ class AccidentDataCleaner:
         """Load all CSV files with correct encodings"""
         try:
             # self.caracteristiques = pd.read_csv(f'{year}/caracteristiques_{year}.csv', sep=',', encoding='cp1252')
-            self.caracteristiques = pd.read_csv(f'{year}/caracteristiques-{year}.csv', sep=';', encoding='iso-8859-1',low_memory=False)
-            self.vehicules = pd.read_csv(f'{year}/vehicules-{year}.csv', sep=';', encoding='utf-8',low_memory=False)
-            self.usagers = pd.read_csv(f'{year}/usagers-{year}.csv', sep=';', encoding='utf-8',low_memory=False)
-            self.lieux = pd.read_csv(f'{year}/lieux-{year}.csv', sep=';', encoding='utf-8',low_memory=False)
+            
+            if year < 2009:
+                self.caracteristiques = pd.read_csv(f'{year}/caracteristiques_{year}.csv', sep=',', encoding='iso-8859-1')
+                self.vehicules = pd.read_csv(f'{year}/vehicules_{year}.csv', sep=',', encoding='utf-8')
+                self.usagers = pd.read_csv(f'{year}/usagers_{year}.csv', sep=',', encoding='utf-8')
+                self.lieux = pd.read_csv(f'{year}/lieux_{year}.csv', sep=',', encoding='utf-8')
+            elif year == 2009:
+                self.caracteristiques = pd.read_csv(f'{year}/caracteristiques_{year}.csv', sep='\t', encoding='utf-8')
+                self.vehicules = pd.read_csv(f'{year}/vehicules_{year}.csv', sep=',', encoding='utf-8')
+                self.usagers = pd.read_csv(f'{year}/usagers_{year}.csv', sep=',', encoding='utf-8')
+                self.lieux = pd.read_csv(f'{year}/lieux_{year}.csv', sep=',', encoding='utf-8')
+            elif year > 2009 and year < 2017:
+                self.caracteristiques = pd.read_csv(f'{year}/caracteristiques_{year}.csv', sep=',', encoding='iso-8859-1')
+                self.vehicules = pd.read_csv(f'{year}/vehicules_{year}.csv', sep=',', encoding='utf-8')
+                self.usagers = pd.read_csv(f'{year}/usagers_{year}.csv', sep=',', encoding='utf-8')
+                self.lieux = pd.read_csv(f'{year}/lieux_{year}.csv', sep=',', encoding='utf-8',low_memory=False) 
+            elif year >= 2017 and year < 2019:
+                self.caracteristiques = pd.read_csv(f'{year}/caracteristiques-{year}.csv', sep=',', encoding='iso-8859-1',low_memory=False)
+                self.vehicules = pd.read_csv(f'{year}/vehicules-{year}.csv', sep=',', encoding='utf-8',low_memory=False)
+                self.usagers = pd.read_csv(f'{year}/usagers-{year}.csv', sep=',', encoding='utf-8',low_memory=False)
+                self.lieux = pd.read_csv(f'{year}/lieux-{year}.csv', sep=',', encoding='utf-8',low_memory=False)
+            elif year == 2022:
+                self.caracteristiques = pd.read_csv(f'{year}/caracteristiques-{year}.csv', sep=';', encoding='utf-8')
+                self.vehicules = pd.read_csv(f'{year}/vehicules-{year}.csv', sep=';', encoding='utf-8')
+                self.usagers = pd.read_csv(f'{year}/usagers-{year}.csv', sep=';', encoding='utf-8')
+                self.lieux = pd.read_csv(f'{year}/lieux-{year}.csv', sep=';', encoding='utf-8',low_memory=False)
+            else:
+                self.caracteristiques = pd.read_csv(f'{year}/caracteristiques-{year}.csv', sep=';', encoding='iso-8859-1',low_memory=False)
+                self.vehicules = pd.read_csv(f'{year}/vehicules-{year}.csv', sep=';', encoding='utf-8',low_memory=False)
+                self.usagers = pd.read_csv(f'{year}/usagers-{year}.csv', sep=';', encoding='utf-8',low_memory=False)
+                self.lieux = pd.read_csv(f'{year}/lieux-{year}.csv', sep=';', encoding='utf-8',low_memory=False)
             
             print("Data loaded successfully")
         except Exception as e:
@@ -50,8 +77,7 @@ class AccidentDataCleaner:
         
         # catv is already an integer type, no need to convert to string
         # Filter only bicycle accidents (catv = 1)
-        bicycle_vehicles = self.vehicules[self.vehicules['catv'] == 1]
-        
+        bicycle_vehicles = self.vehicules[(self.vehicules['catv'] == 1) | (self.vehicules['catv'] == 80)]        
         # Get unique accident IDs involving bicycles
         self.bicycle_accident_ids = set(bicycle_vehicles['Num_Acc'].unique())
         
@@ -66,7 +92,7 @@ class AccidentDataCleaner:
         self.usagers = self.usagers.copy()
         
         # Calculate age from birth year
-        current_year = 2022
+        current_year = 2024
         self.usagers['age'] = current_year - pd.to_numeric(self.usagers['an_nais'], errors='coerce')
         
         # Filter users involved in bicycle accidents
@@ -118,7 +144,7 @@ class AccidentDataCleaner:
             raise
 
 def main():
-    for i in range(2023,2024):
+    for i in range(2005,2024):
         print(i)
         # Create cleaner instance
         cleaner = AccidentDataCleaner()

@@ -86,49 +86,6 @@ export class DataProcessor {
         return id.toString().trim();
     }
 
-    // async processAllYearsBicycleAccidents() {
-    //     this.aggregatedBicycleAccidents = [];
-
-    //     Object.entries(this.yearlyData).forEach(([year, yearData]) => {
-    //         if (!yearData) return; // Skip years with failed data loading
-    //         const bicycleVehicles = yearData.vehicules.filter(v =>
-    //             v.catv && ['1', '01'].includes(v.catv.toString().trim())
-    //         );
-
-    //         const bicycleAccidentIds = new Set(
-    //             bicycleVehicles.map(v => this.normalizeId(v.Num_Acc))
-    //         );
-
-    //         const yearAccidents = yearData.caracteristiques
-    //             .filter(acc => bicycleAccidentIds.has(this.normalizeId(acc.Num_Acc)))
-    //             .map(acc => {
-    //                 const normalizedId = this.normalizeId(acc.Num_Acc);
-    //                 const lieuxInfo = yearData.lieux.find(l =>
-    //                     this.normalizeId(l.Num_Acc) === normalizedId
-    //                 );
-    //                 const usagersInfo = yearData.usagers.filter(u =>
-    //                     this.normalizeId(u.Num_Acc) === normalizedId
-    //                 );
-
-    //                 const lat = this.parseFrenchnumber(acc.lat);
-    //                 const long = this.parseFrenchnumber(acc.long);
-
-    //                 return {
-    //                     ...acc,
-    //                     year: parseInt(year),
-    //                     lat,
-    //                     long,
-    //                     users: usagersInfo,
-    //                     location_details: lieuxInfo
-    //                 };
-    //             });
-    //         this.logger.log(yearAccidents)
-
-    //         this.aggregatedBicycleAccidents.push(...yearAccidents);
-    //     });
-
-    //     return this.aggregatedBicycleAccidents;
-    // }
 
     async processAllYearsBicycleAccidents() {
         this.aggregatedBicycleAccidents = [];
@@ -141,7 +98,7 @@ export class DataProcessor {
             await new Promise(resolve => setTimeout(resolve, 0));
 
             const bicycleVehicles = yearData.vehicules.filter(v =>
-                v.catv && ['1', '01'].includes(v.catv.toString().trim())
+                v.catv && ['1', '01', '80'].includes(v.catv.toString().trim())
             );
 
             const bicycleAccidentIds = new Set(

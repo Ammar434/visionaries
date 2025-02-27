@@ -259,11 +259,136 @@ export const VIZ_CONFIG = {
             fade: 0.3
         }
     },
+    // colorScales: {
+    //     timeOfDay: {
+    //         title: "Moment de la journée",
+    //         domain: ['plein-jour', 'crepuscule', 'nuit-sans-eclairage', 'nuit-eclairage-eteint', 'nuit-eclairage-allume'],
+    //         range: ['#ffd700', '#ffa500', '#2c3e50', '#34495e', '#7f8c8d'],
+    //         labels: {
+    //             'plein-jour': 'Plein jour',
+    //             'crepuscule': 'Crépuscule',
+    //             'nuit-sans-eclairage': 'Nuit (sans éclairage)',
+    //             'nuit-eclairage-eteint': 'Nuit (éclairage éteint)',
+    //             'nuit-eclairage-allume': 'Nuit (éclairage allumé)'
+    //         }
+    //     },
+    //     weather: {
+    //         title: "Conditions météo",
+    //         domain: ['normal', 'pluie-legere', 'pluie-forte', 'neige-grele', 'brouillard', 'vent-tempete', 'temps-eblouissant', 'temps-couvert', 'autre-meteo'],
+    //         range: ['#66c2a5', '#8da0cb', '#6baed6', '#a6cee3', '#b2df8a', '#e31a1c', '#fb9a99', '#fdbf6f', '#cab2d6'],
+    //         labels: {
+    //             'normal': 'Normal',
+    //             'pluie-legere': 'Pluie légère',
+    //             'pluie-forte': 'Pluie forte',
+    //             'neige-grele': 'Neige/Grêle',
+    //             'brouillard': 'Brouillard',
+    //             'vent-tempete': 'Vent/Tempête',
+    //             'temps-eblouissant': 'Éblouissant',
+    //             'temps-couvert': 'Couvert',
+    //             'autre-meteo': 'Autre'
+    //         }
+    //     },
+    //     location: {
+    //         title: "Type de localisation",
+    //         domain: ['en-agglomeration', 'hors-agglomeration'],
+    //         range: ['#e78ac3', '#a6d854'],
+    //         labels: {
+    //             'en-agglomeration': 'Zone urbaine',
+    //             'hors-agglomeration': 'Zone rurale'
+    //         }
+    //     },
+    //     roadType: {
+    //         title: "Type de route",
+    //         domain: ['autoroute', 'nationale', 'departementale', 'communale', 'metropole', 'autre-route'],
+    //         range: ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#999999'],
+    //         labels: {
+    //             'autoroute': 'Autoroute',
+    //             'nationale': 'Nationale',
+    //             'departementale': 'Départementale',
+    //             'communale': 'Communale',
+    //             'metropole': 'Métropole',
+    //             'autre-route': 'Autre'
+    //         }
+    //     },
+    //     cyclePath: {
+    //         title: "Aménagement cyclable",
+    //         domain: ['standard', 'piste-cyclable', 'bande-cyclable', 'voie-reservee'],
+    //         range: ['#999999', '#66c2a5', '#fc8d62', '#8da0cb'],
+    //         labels: {
+    //             'standard': 'Sans aménagement',
+    //             'piste-cyclable': 'Piste cyclable',
+    //             'bande-cyclable': 'Bande cyclable',
+    //             'voie-reservee': 'Voie réservée'
+    //         }
+    //     },
+    //     interactionType: {
+    //         title: "Type d'interaction",
+    //         domain: ['seul', 'avec-vehicule', 'avec-pieton', 'avec-infrastructure', 'interaction-inconnue'],
+    //         range: ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3', '#a6d854'],
+    //         labels: {
+    //             'seul': 'Accident seul',
+    //             'avec-vehicule': 'Avec véhicule',
+    //             'avec-pieton': 'Avec piéton',
+    //             'avec-infrastructure': 'Avec obstacle',
+    //             'interaction-inconnue': 'Interaction inconnue'
+    //         }
+    //     },
+    //     collision: {
+    //         title: "Type de collision",
+    //         domain: ['collision-frontale', 'collision-arriere', 'collision-cote', 'collision-chaine', 'collision-multiple', 'autre-collision', 'sans-collision'],
+    //         range: ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628'],
+    //         labels: {
+    //             'collision-frontale': 'Frontale',
+    //             'collision-arriere': 'Par l\'arrière',
+    //             'collision-cote': 'Par le côté',
+    //             'collision-chaine': 'En chaîne',
+    //             'collision-multiple': 'Multiple',
+    //             'autre-collision': 'Autre collision',
+    //             'sans-collision': 'Sans collision'
+    //         }
+    //     },
+    //     maneuver: {
+    //         title: "Manœuvre",
+    //         domain: ['sans-changement', 'changement-direction', 'depassement', 'stationnement', 'traversee', 'autre-manoeuvre'],
+    //         range: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'],
+    //         labels: {
+    //             'sans-changement': 'En ligne droite',
+    //             'changement-direction': 'Changement de direction',
+    //             'depassement': 'Dépassement',
+    //             'stationnement': 'Stationnement',
+    //             'traversee': 'Traversée',
+    //             'autre-manoeuvre': 'Autre manœuvre'
+    //         }
+    //     },
+    //     severity: {
+    //         title: "Gravité des blessures",
+    //         domain: ['indemne', 'blesse-leger', 'hospitalise', 'tue'],
+    //         range: ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3'],
+    //         labels: {
+    //             'indemne': 'Indemne',
+    //             'blesse-leger': 'Blessure légère',
+    //             'hospitalise': 'Hospitalisé',
+    //             'tue': 'Fatal'
+    //         }
+    //     },
+    //     cycleType: {
+    //         title: "Type de vélo",
+    //         domain: ['velo-standard', 'velo-electrique'],
+    //         range: ['#1f78b4', '#33a02c'],
+    //         labels: {
+    //             'velo-standard': 'Vélo standard',
+    //             'velo-electrique': 'Vélo électrique'
+    //         }
+    //     }
+    // },
+    // Replace the colorScales in VIZ_CONFIG with this improved version
+    // This uses more distinct color schemes with better contrast
+
     colorScales: {
         timeOfDay: {
             title: "Moment de la journée",
             domain: ['plein-jour', 'crepuscule', 'nuit-sans-eclairage', 'nuit-eclairage-eteint', 'nuit-eclairage-allume'],
-            range: ['#ffd700', '#ffa500', '#2c3e50', '#34495e', '#7f8c8d'],
+            range: ['#FFA500', '#FF6347', '#191970', '#483D8B', '#6A5ACD'],
             labels: {
                 'plein-jour': 'Plein jour',
                 'crepuscule': 'Crépuscule',
@@ -275,7 +400,7 @@ export const VIZ_CONFIG = {
         weather: {
             title: "Conditions météo",
             domain: ['normal', 'pluie-legere', 'pluie-forte', 'neige-grele', 'brouillard', 'vent-tempete', 'temps-eblouissant', 'temps-couvert', 'autre-meteo'],
-            range: ['#66c2a5', '#8da0cb', '#6baed6', '#a6cee3', '#b2df8a', '#e31a1c', '#fb9a99', '#fdbf6f', '#cab2d6'],
+            range: ['#4CAF50', '#81C784', '#1976D2', '#0D47A1', '#B2EBF2', '#F44336', '#FFEB3B', '#78909C', '#9C27B0'],
             labels: {
                 'normal': 'Normal',
                 'pluie-legere': 'Pluie légère',
@@ -291,7 +416,7 @@ export const VIZ_CONFIG = {
         location: {
             title: "Type de localisation",
             domain: ['en-agglomeration', 'hors-agglomeration'],
-            range: ['#e78ac3', '#a6d854'],
+            range: ['#D81B60', '#2E7D32'],
             labels: {
                 'en-agglomeration': 'Zone urbaine',
                 'hors-agglomeration': 'Zone rurale'
@@ -300,7 +425,7 @@ export const VIZ_CONFIG = {
         roadType: {
             title: "Type de route",
             domain: ['autoroute', 'nationale', 'departementale', 'communale', 'metropole', 'autre-route'],
-            range: ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#999999'],
+            range: ['#B71C1C', '#1565C0', '#33691E', '#6A1B9A', '#EF6C00', '#546E7A'],
             labels: {
                 'autoroute': 'Autoroute',
                 'nationale': 'Nationale',
@@ -313,7 +438,7 @@ export const VIZ_CONFIG = {
         cyclePath: {
             title: "Aménagement cyclable",
             domain: ['standard', 'piste-cyclable', 'bande-cyclable', 'voie-reservee'],
-            range: ['#999999', '#66c2a5', '#fc8d62', '#8da0cb'],
+            range: ['#757575', '#00897B', '#E65100', '#3949AB'],
             labels: {
                 'standard': 'Sans aménagement',
                 'piste-cyclable': 'Piste cyclable',
@@ -324,7 +449,7 @@ export const VIZ_CONFIG = {
         interactionType: {
             title: "Type d'interaction",
             domain: ['seul', 'avec-vehicule', 'avec-pieton', 'avec-infrastructure', 'interaction-inconnue'],
-            range: ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3', '#a6d854'],
+            range: ['#00ACC1', '#FF5722', '#5E35B1', '#827717', '#8D6E63'],
             labels: {
                 'seul': 'Accident seul',
                 'avec-vehicule': 'Avec véhicule',
@@ -336,7 +461,7 @@ export const VIZ_CONFIG = {
         collision: {
             title: "Type de collision",
             domain: ['collision-frontale', 'collision-arriere', 'collision-cote', 'collision-chaine', 'collision-multiple', 'autre-collision', 'sans-collision'],
-            range: ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628'],
+            range: ['#D32F2F', '#1976D2', '#388E3C', '#7B1FA2', '#FBC02D', '#E64A19', '#5D4037'],
             labels: {
                 'collision-frontale': 'Frontale',
                 'collision-arriere': 'Par l\'arrière',
@@ -350,7 +475,7 @@ export const VIZ_CONFIG = {
         maneuver: {
             title: "Manœuvre",
             domain: ['sans-changement', 'changement-direction', 'depassement', 'stationnement', 'traversee', 'autre-manoeuvre'],
-            range: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'],
+            range: ['#0288D1', '#D81B60', '#689F38', '#FFA000', '#5E35B1', '#607D8B'],
             labels: {
                 'sans-changement': 'En ligne droite',
                 'changement-direction': 'Changement de direction',
@@ -363,7 +488,7 @@ export const VIZ_CONFIG = {
         severity: {
             title: "Gravité des blessures",
             domain: ['indemne', 'blesse-leger', 'hospitalise', 'tue'],
-            range: ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3'],
+            range: ['#4CAF50', '#FFC107', '#FF9800', '#F44336'],
             labels: {
                 'indemne': 'Indemne',
                 'blesse-leger': 'Blessure légère',
@@ -374,13 +499,14 @@ export const VIZ_CONFIG = {
         cycleType: {
             title: "Type de vélo",
             domain: ['velo-standard', 'velo-electrique'],
-            range: ['#1f78b4', '#33a02c'],
+            range: ['#2196F3', '#4CAF50'],
             labels: {
                 'velo-standard': 'Vélo standard',
                 'velo-electrique': 'Vélo électrique'
             }
         }
     },
+
     animation: {
         duration: 750,
         delay: 50
@@ -407,28 +533,28 @@ export class AccidentSequences {
         this.sequencePatterns = {};
     }
 
-    async createHierarchicalData() {
-        try {
-            // Load and process accidents
-            const accidents = await this.processor.loadAllYearsData();
-            this.bicycleAccidents = accidents;
+    // async createHierarchicalData() {
+    //     try {
+    //         // Load and process accidents
+    //         const accidents = await this.processor.loadAllYearsData();
+    //         this.bicycleAccidents = accidents;
 
-            // Analyze accidents to extract patterns and contexts
-            this.analyzedAccidents = this.enrichAccidentData(accidents);
+    //         // Analyze accidents to extract patterns and contexts
+    //         this.analyzedAccidents = this.enrichAccidentData(accidents);
 
-            // Convert to sequences for hierarchical structure
-            const sequences = this.extractSequences(this.analyzedAccidents);
+    //         // Convert to sequences for hierarchical structure
+    //         const sequences = this.extractSequences(this.analyzedAccidents);
 
-            // Build hierarchy for visualization
-            const hierarchy = this.buildHierarchy(sequences);
+    //         // Build hierarchy for visualization
+    //         const hierarchy = this.buildHierarchy(sequences);
 
-            // Return the hierarchical data
-            return hierarchy;
-        } catch (error) {
-            console.error("Error creating hierarchical data:", error);
-            throw error;
-        }
-    }
+    //         // Return the hierarchical data
+    //         return hierarchy;
+    //     } catch (error) {
+    //         console.error("Error creating hierarchical data:", error);
+    //         throw error;
+    //     }
+    // }
 
     enrichAccidentData(accidents) {
         return accidents.map(accident => {
@@ -537,7 +663,7 @@ export class AccidentSequences {
             location: ACCIDENT_MAPPINGS.location[accident.agg] || 'inconnu',
             intersection: ACCIDENT_MAPPINGS.intersection[accident.int] || 'inconnu',
             collisionType: ACCIDENT_MAPPINGS.collision[accident.col] || 'inconnu',
-            cycleType: bicycleVehicle?.catv === '80' ? 'velo-electrique' : 'velo-standard',
+            cycleType: bicycleVehicle.catv === '80' ? 'velo-electrique' : 'velo-standard',
             surface: ACCIDENT_MAPPINGS.surface[accident.location_details?.surf] || 'inconnu',
             maneuver: ACCIDENT_MAPPINGS.maneuver[bicycleVehicle?.manv] || 'inconnu',
             impactPoint: ACCIDENT_MAPPINGS.impactPoint[bicycleVehicle?.choc] || 'inconnu',
@@ -718,7 +844,74 @@ export class AccidentSequences {
             cycleType
         };
     }
+    // In the AccidentSequences class, ensure extractSequences works correctly with any level order:
 
+    extractSequences(enrichedAccidents, levelOrder = null) {
+        console.log("Extracting sequences with level order:", levelOrder);
+
+        // Filter out accidents that couldn't be processed
+        const validAccidents = enrichedAccidents.filter(accident =>
+            accident.sequence && !accident.isMissingData && !accident.processingError
+        );
+
+        // Use provided level order or default to VIZ_CONFIG.levels
+        const levelIds = levelOrder || VIZ_CONFIG.levels.map(level => level.id);
+
+        console.log(`Using level order: ${levelIds.join(', ')}`);
+
+        // Convert to sequence format expected by hierarchical visualization
+        return validAccidents.map(accident => {
+            const seq = accident.sequence;
+
+            // Create an array of sequence elements aligned with the provided level order
+            const sequenceArray = levelIds.map(levelId => {
+                switch (levelId) {
+                    case 'timeOfDay': return seq.timeOfDay || 'inconnu';
+                    case 'weather': return seq.weather || 'inconnu';
+                    case 'location': return seq.location || 'inconnu';
+                    case 'roadType': return seq.roadType || 'inconnu';
+                    case 'cyclePath': return seq.cyclePath || 'standard';
+                    case 'interactionType': return seq.interactionType || 'interaction-inconnue';
+                    case 'collision': return seq.collision || 'inconnu';
+                    case 'maneuver': return seq.maneuver || 'autre-manoeuvre';
+                    case 'severity': return seq.severity || 'inconnu';
+                    case 'cycleType': return seq.cycleType || 'velo-standard';
+                    default: return 'inconnu';
+                }
+            });
+
+            return {
+                sequence: sequenceArray.join('-'),
+                rawSequence: sequenceArray,
+                value: 1,  // Each accident counts as 1
+                accident: accident  // Reference to full accident data if needed
+            };
+        });
+    }
+
+    // Make sure createHierarchicalData works with our modifications:
+    async createHierarchicalData(levelOrder = null) {
+        try {
+            // Load and process accidents
+            const accidents = await this.processor.loadAllYearsData();
+            this.bicycleAccidents = accidents;
+
+            // Analyze accidents to extract patterns and contexts
+            this.analyzedAccidents = this.enrichAccidentData(accidents);
+
+            // Convert to sequences for hierarchical structure with specified level order
+            const sequences = this.extractSequences(this.analyzedAccidents, levelOrder);
+
+            // Build hierarchy for visualization
+            const hierarchy = this.buildHierarchy(sequences);
+
+            // Return the hierarchical data
+            return hierarchy;
+        } catch (error) {
+            console.error("Error creating hierarchical data:", error);
+            throw error;
+        }
+    }
     // extractSequences(enrichedAccidents) {
     //     // Filter out accidents that couldn't be processed
     //     const validAccidents = enrichedAccidents.filter(accident =>
@@ -753,44 +946,7 @@ export class AccidentSequences {
     //     });
     // }
 
-    extractSequences(enrichedAccidents, levelOrder = null) {
-        // Filter out accidents that couldn't be processed
-        const validAccidents = enrichedAccidents.filter(accident =>
-            accident.sequence && !accident.isMissingData && !accident.processingError
-        );
 
-        // Use provided level order or default to VIZ_CONFIG.levels
-        const levelIds = levelOrder || VIZ_CONFIG.levels.map(level => level.id);
-
-        // Convert to sequence format expected by hierarchical visualization
-        return validAccidents.map(accident => {
-            const seq = accident.sequence;
-
-            // Create an array of sequence elements aligned with the provided level order
-            const sequenceArray = levelIds.map(levelId => {
-                switch (levelId) {
-                    case 'timeOfDay': return seq.timeOfDay || 'inconnu';
-                    case 'weather': return seq.weather || 'inconnu';
-                    case 'location': return seq.location || 'inconnu';
-                    case 'roadType': return seq.roadType || 'inconnu';
-                    case 'cyclePath': return seq.cyclePath || 'standard';
-                    case 'interactionType': return seq.interactionType || 'interaction-inconnue';
-                    case 'collision': return seq.collision || 'inconnu';
-                    case 'maneuver': return seq.maneuver || 'autre-manoeuvre';
-                    case 'severity': return seq.severity || 'inconnu';
-                    case 'cycleType': return seq.cycleType || 'velo-standard';
-                    default: return 'inconnu';
-                }
-            });
-
-            return {
-                sequence: sequenceArray.join('-'),
-                rawSequence: sequenceArray,
-                value: 1,
-                accident: accident
-            };
-        });
-    }
     // Add this function to your AccidentSequences class to properly map level IDs to sequence positions
     getLevelPosition(levelId) {
         return VIZ_CONFIG.levels.findIndex(level => level.id === levelId);

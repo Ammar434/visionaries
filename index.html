@@ -105,7 +105,7 @@
 
         .nav-links a {
             text-decoration: none;
-            color: #333;
+            color: white;
             font-weight: 500;
             transition: color 0.3s;
         }
@@ -482,7 +482,7 @@
                             d="M19 22C21.2091 22 23 20.2091 23 18C23 15.7909 21.2091 14 19 14C16.7909 14 15 15.7909 15 18C15 20.2091 16.7909 22 19 22Z"
                             stroke="#0052CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    Vélo Sécurité
+                    Vizionaries - Understand bicycle accident
                 </a>
                 <ul class="nav-links">
 
@@ -1172,7 +1172,192 @@
                 .text('Number of Accidents');
         }
 
-        // Replace the entire createSeasonalPatternsChart function with this simpler version
+        // // Replace the entire createSeasonalPatternsChart function with this simpler version
+        // function createSeasonalPatternsChart() {
+        //     console.log("Creating seasonal patterns chart...");
+        //     const container = d3.select('#seasonalPatternsChart');
+        //     container.html(""); // Clear the container
+
+        //     // Force container to be visible with fixed dimensions
+        //     container.style('display', 'block')
+        //         .style('height', '300px')
+        //         .style('width', '100%');
+
+        //     // Log container dimensions
+        //     const width = parseInt(container.style('width'));
+        //     const height = parseInt(container.style('height'));
+        //     console.log(`Seasonal chart container: width=${width}, height=${height}`);
+
+        //     // Get the monthly data directly
+        //     const monthlyData = dataProcessor.getAccidentsByMonth();
+        //     console.log("Monthly data:", monthlyData);
+
+        //     // Create a very simple SVG
+        //     const svg = container.append('svg')
+        //         .attr('width', '100%')
+        //         .attr('height', '100%');
+
+        //     // Create simple bars - avoid complex d3 scales for now
+        //     const barWidth = 30;
+        //     const spacing = 10;
+        //     const maxCount = Math.max(...monthlyData.map(d => d.count));
+        //     const heightScale = 200 / maxCount; // Scale to fit in 200px height
+
+        //     // Add title
+        //     svg.append('text')
+        //         .attr('x', 400)
+        //         .attr('y', 30)
+        //         .attr('text-anchor', 'middle')
+        //         .style('font-weight', 'bold')
+        //         .text('Seasonal Accident Patterns');
+
+        //     // Add bars manually
+        //     monthlyData.forEach((month, i) => {
+        //         const barHeight = month.count * heightScale;
+        //         const x = 100 + i * (barWidth + spacing);
+        //         const y = 250 - barHeight;
+
+        //         // Add the bar
+        //         svg.append('rect')
+        //             .attr('x', x)
+        //             .attr('y', y)
+        //             .attr('width', barWidth)
+        //             .attr('height', barHeight)
+        //             .attr('fill', '#0052cc');
+
+        //         // Add month label
+        //         svg.append('text')
+        //             .attr('x', x + barWidth / 2)
+        //             .attr('y', 265)
+        //             .attr('text-anchor', 'middle')
+        //             .style('font-size', '10px')
+        //             .text(month.month.substr(0, 3));
+
+        //         // Add count label
+        //         svg.append('text')
+        //             .attr('x', x + barWidth / 2)
+        //             .attr('y', y - 5)
+        //             .attr('text-anchor', 'middle')
+        //             .style('font-size', '10px')
+        //             .text(month.count);
+        //     });
+        // }
+
+        // function createUrbanRuralChart() {
+        //     console.log("Creating urban/rural chart...");
+        //     const container = d3.select('#urbanRuralChart');
+        //     container.html(""); // Clear the container
+
+        //     // Force container to be visible with fixed dimensions
+        //     container.style('display', 'block')
+        //         .style('height', '300px')
+        //         .style('width', '100%');
+
+        //     // Log container dimensions
+        //     const width = parseInt(container.style('width'));
+        //     const height = parseInt(container.style('height'));
+        //     console.log(`Urban/Rural chart container: width=${width}, height=${height}`);
+
+        //     // Get the urban/rural data
+        //     const locationData = dataProcessor.getUrbanVsRuralAccidents();
+        //     const total = locationData.reduce((sum, item) => sum + item.count, 0);
+
+        //     // Calculate percentages
+        //     locationData.forEach(item => {
+        //         item.percentage = Math.round((item.count / total) * 100);
+        //     });
+
+        //     console.log("Location data with percentages:", locationData);
+
+        //     // Create a very simple SVG
+        //     const svg = container.append('svg')
+        //         .attr('width', '100%')
+        //         .attr('height', '100%');
+
+        //     // Add title
+        //     svg.append('text')
+        //         .attr('x', 400)
+        //         .attr('y', 30)
+        //         .attr('text-anchor', 'middle')
+        //         .style('font-weight', 'bold')
+        //         .text('Urban vs Rural Distribution');
+
+        //     // Create a simple pie chart manually
+        //     const centerX = 400;
+        //     const centerY = 150;
+        //     const radius = 100;
+
+        //     // Create pie slices
+        //     const urbanPercentage = locationData[0].percentage / 100;
+        //     const ruralPercentage = locationData[1].percentage / 100;
+
+        //     // Urban slice (blue)
+        //     svg.append('path')
+        //         .attr('d', describeArc(centerX, centerY, radius, 0, urbanPercentage * 360))
+        //         .attr('fill', '#1f78b4');
+
+        //     // Rural slice (green)
+        //     svg.append('path')
+        //         .attr('d', describeArc(centerX, centerY, radius, urbanPercentage * 360, 360))
+        //         .attr('fill', '#33a02c');
+
+        //     // Add center circle (donut hole)
+        //     svg.append('circle')
+        //         .attr('cx', centerX)
+        //         .attr('cy', centerY)
+        //         .attr('r', radius * 0.6)
+        //         .attr('fill', 'white');
+
+        //     // Add percentage labels
+        //     svg.append('text')
+        //         .attr('x', centerX)
+        //         .attr('y', centerY - 10)
+        //         .attr('text-anchor', 'middle')
+        //         .style('font-size', '18px')
+        //         .style('font-weight', 'bold')
+        //         .text(`${locationData[0].percentage}%`);
+
+        //     svg.append('text')
+        //         .attr('x', centerX)
+        //         .attr('y', centerY + 20)
+        //         .attr('text-anchor', 'middle')
+        //         .style('font-size', '14px')
+        //         .text('Urban');
+
+        //     // Add a legend
+        //     svg.append('rect')
+        //         .attr('x', 600)
+        //         .attr('y', 120)
+        //         .attr('width', 20)
+        //         .attr('height', 20)
+        //         .attr('fill', '#1f78b4');
+
+        //     svg.append('text')
+        //         .attr('x', 630)
+        //         .attr('y', 135)
+        //         .text(`Urban: ${locationData[0].percentage}%`);
+
+        //     svg.append('rect')
+        //         .attr('x', 600)
+        //         .attr('y', 150)
+        //         .attr('width', 20)
+        //         .attr('height', 20)
+        //         .attr('fill', '#33a02c');
+
+        //     svg.append('text')
+        //         .attr('x', 630)
+        //         .attr('y', 165)
+        //         .text(`Rural: ${locationData[1].percentage}%`);
+
+        //     // Add total count
+        //     svg.append('text')
+        //         .attr('x', centerX)
+        //         .attr('y', centerY + 80)
+        //         .attr('text-anchor', 'middle')
+        //         .text(`Total: ${total.toLocaleString()} accidents`);
+        // }
+
+        // Fix for Seasonal Patterns Chart
         function createSeasonalPatternsChart() {
             console.log("Creating seasonal patterns chart...");
             const container = d3.select('#seasonalPatternsChart');
@@ -1183,10 +1368,13 @@
                 .style('height', '300px')
                 .style('width', '100%');
 
-            // Log container dimensions
-            const width = parseInt(container.style('width'));
-            const height = parseInt(container.style('height'));
+            // Get container dimensions - use clientWidth instead of style width when possible
+            const width = container.node().clientWidth || parseInt(container.style('width'));
+            const height = container.node().clientHeight || 300;
             console.log(`Seasonal chart container: width=${width}, height=${height}`);
+
+            // Calculate center position
+            const centerX = width / 2;
 
             // Get the monthly data directly
             const monthlyData = dataProcessor.getAccidentsByMonth();
@@ -1195,27 +1383,33 @@
             // Create a very simple SVG
             const svg = container.append('svg')
                 .attr('width', '100%')
-                .attr('height', '100%');
+                .attr('height', '100%')
+                .attr('viewBox', `0 0 ${width} ${height}`) // Add viewBox for responsiveness
+                .attr('preserveAspectRatio', 'xMidYMid meet'); // Center content
 
-            // Create simple bars - avoid complex d3 scales for now
-            const barWidth = 30;
-            const spacing = 10;
+            // Calculate dynamic bar sizing based on container width and data length
+            const totalBars = monthlyData.length;
+            const chartWidth = width * 0.8; // Use 80% of container width for the chart
+            const chartMargin = (width - chartWidth) / 2; // Center the chart
+            const barWidth = Math.min(30, (chartWidth / totalBars) - 10); // Max 30px width, min 10px spacing
+            const spacing = (chartWidth / totalBars) - barWidth;
+
             const maxCount = Math.max(...monthlyData.map(d => d.count));
-            const heightScale = 200 / maxCount; // Scale to fit in 200px height
+            const heightScale = (height * 0.7) / maxCount; // Use 70% of container height
 
-            // Add title
+            // Add title - center it based on container width
             svg.append('text')
-                .attr('x', 400)
+                .attr('x', centerX)
                 .attr('y', 30)
                 .attr('text-anchor', 'middle')
                 .style('font-weight', 'bold')
                 .text('Seasonal Accident Patterns');
 
-            // Add bars manually
+            // Add bars centered in container
             monthlyData.forEach((month, i) => {
                 const barHeight = month.count * heightScale;
-                const x = 100 + i * (barWidth + spacing);
-                const y = 250 - barHeight;
+                const x = chartMargin + i * (barWidth + spacing);
+                const y = height - 50 - barHeight; // Position from bottom with padding
 
                 // Add the bar
                 svg.append('rect')
@@ -1228,7 +1422,7 @@
                 // Add month label
                 svg.append('text')
                     .attr('x', x + barWidth / 2)
-                    .attr('y', 265)
+                    .attr('y', height - 35) // Fixed position from bottom
                     .attr('text-anchor', 'middle')
                     .style('font-size', '10px')
                     .text(month.month.substr(0, 3));
@@ -1243,6 +1437,7 @@
             });
         }
 
+        // Fix for Urban/Rural Chart
         function createUrbanRuralChart() {
             console.log("Creating urban/rural chart...");
             const container = d3.select('#urbanRuralChart');
@@ -1253,9 +1448,9 @@
                 .style('height', '300px')
                 .style('width', '100%');
 
-            // Log container dimensions
-            const width = parseInt(container.style('width'));
-            const height = parseInt(container.style('height'));
+            // Get container dimensions
+            const width = container.node().clientWidth || parseInt(container.style('width'));
+            const height = container.node().clientHeight || 300;
             console.log(`Urban/Rural chart container: width=${width}, height=${height}`);
 
             // Get the urban/rural data
@@ -1272,20 +1467,24 @@
             // Create a very simple SVG
             const svg = container.append('svg')
                 .attr('width', '100%')
-                .attr('height', '100%');
+                .attr('height', '100%')
+                .attr('viewBox', `0 0 ${width} ${height}`) // Add viewBox for responsiveness
+                .attr('preserveAspectRatio', 'xMidYMid meet'); // Center content
+
+            // Calculate center position
+            const centerX = width / 2;
 
             // Add title
             svg.append('text')
-                .attr('x', 400)
+                .attr('x', centerX)
                 .attr('y', 30)
                 .attr('text-anchor', 'middle')
                 .style('font-weight', 'bold')
                 .text('Urban vs Rural Distribution');
 
-            // Create a simple pie chart manually
-            const centerX = 400;
-            const centerY = 150;
-            const radius = 100;
+            // Use a smaller, properly centered pie chart
+            const radius = Math.min(width, height) / 3; // Use 1/3 of smallest dimension
+            const centerY = height / 2;
 
             // Create pie slices
             const urbanPercentage = locationData[0].percentage / 100;
@@ -1324,39 +1523,47 @@
                 .style('font-size', '14px')
                 .text('Urban');
 
-            // Add a legend
+            // Add a legend - position based on container width
+            const legendX = centerX + radius + 20; // Position legend to the right of the pie
+
+            // If the legend would be outside the container, position it below the pie instead
+            const useBottomLegend = legendX + 130 > width;
+            const legendPositionX = useBottomLegend ? centerX - 100 : legendX;
+            const legendPositionY = useBottomLegend ? centerY + radius + 20 : centerY - 30;
+
+            // Urban legend item
             svg.append('rect')
-                .attr('x', 600)
-                .attr('y', 120)
+                .attr('x', legendPositionX)
+                .attr('y', legendPositionY)
                 .attr('width', 20)
                 .attr('height', 20)
                 .attr('fill', '#1f78b4');
 
             svg.append('text')
-                .attr('x', 630)
-                .attr('y', 135)
+                .attr('x', legendPositionX + 30)
+                .attr('y', legendPositionY + 15)
                 .text(`Urban: ${locationData[0].percentage}%`);
 
+            // Rural legend item
             svg.append('rect')
-                .attr('x', 600)
-                .attr('y', 150)
+                .attr('x', legendPositionX)
+                .attr('y', legendPositionY + 30)
                 .attr('width', 20)
                 .attr('height', 20)
                 .attr('fill', '#33a02c');
 
             svg.append('text')
-                .attr('x', 630)
-                .attr('y', 165)
+                .attr('x', legendPositionX + 30)
+                .attr('y', legendPositionY + 45)
                 .text(`Rural: ${locationData[1].percentage}%`);
 
             // Add total count
             svg.append('text')
                 .attr('x', centerX)
-                .attr('y', centerY + 80)
+                .attr('y', useBottomLegend ? centerY + 100 : centerY + 120)
                 .attr('text-anchor', 'middle')
                 .text(`Total: ${total.toLocaleString()} accidents`);
         }
-
         // Helper function to create pie/donut chart segments
         function describeArc(x, y, radius, startAngle, endAngle) {
             const start = polarToCartesian(x, y, radius, endAngle);
